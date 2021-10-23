@@ -367,7 +367,7 @@ public:
 
 ### 上网行为管理示例（sample/http_access_control）
 
-![](./ac.png)
+![](.\ac.png)
 
 ### 接口说明
 

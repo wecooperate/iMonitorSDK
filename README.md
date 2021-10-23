@@ -193,11 +193,11 @@ int main()
 }
 ```
 
-<img src=".\doc\sysmon.gif" />
+<img src="./doc/sysmon.gif" />
 
 示例四：上网行为管理（基于网络重定向的方式实现，支持https，详细参考http_access_control例子）
 
-![](.\doc\ac.png)
+![](./doc/ac.png)
 
 更多的示例可以参考sample目录。
 

@@ -21,16 +21,10 @@ void HTTPChannel::OnLocalReceive(const char* Data, ULONG Length)
 	if (m_parse_failed)
 		return;
 
-	m_parsing = true;
 	size_t parser_length = Parse(Data, Length);
-	m_parsing = false;
 
 	if (parser_length != Length)
 		m_parse_failed = true;
-
-	if (m_closed) {
-		delete this;
-	}
 }
 
 void HTTPChannel::OnLocalSSLHello(const char* ServerName)
@@ -41,11 +35,6 @@ void HTTPChannel::OnLocalSSLHello(const char* ServerName)
 void HTTPChannel::OnClose(void)
 {
 	m_channel = nullptr;
-	m_closed = true;
-
-	if (!m_parsing) {
-		delete this;
-	}
 }
 
 int HTTPChannel::on_headers_complete(http_parser* parser)
@@ -126,9 +115,7 @@ void HTTPChannel::FinishRequest(http_status status, const std::string& data)
 	std::string response = ss.str();
 
 	m_channel->LocalSend(response.c_str(), response.length());
-
-	if (m_channel)
-		m_channel->Close();
+	m_channel->Close();
 }
 
 void HTTPChannelManager::OnCreate(IAgentChannel* Channel)
@@ -170,4 +157,6 @@ void HTTPChannelManager::OnClose(IAgentChannel* Channel)
 		return;
 
 	http_channel->OnClose();
+
+	delete http_channel;
 }

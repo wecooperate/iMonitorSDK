@@ -32,8 +32,6 @@ protected:
 	IAgentChannel* m_channel = NULL;
 	bool m_parse_failed = false;
 	bool m_ssl = false;
-	bool m_closed = false;
-	bool m_parsing = false;
 };
 //******************************************************************************
 class HTTPChannelManager : public IAgentCallback

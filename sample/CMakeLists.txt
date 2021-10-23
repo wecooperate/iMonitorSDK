@@ -43,3 +43,6 @@ foreach(FILE_PATH IN ITEMS ${SOURCE_FILES})
 	add_executable(${FILE_NAME} ${FILE_PATH})
 	SET_TARGET_PROPERTIES(${FILE_NAME} PROPERTIES LINK_FLAGS "/MANIFESTUAC:\"level='requireAdministrator' uiAccess='false'\"")
 endforeach()
+
+add_subdirectory(http_access_control)
+

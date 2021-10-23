@@ -15,6 +15,7 @@
 #include <atlbase.h>
 //******************************************************************************
 #include "iMonitor.h"
+#include "iMonitorSDKExtension.h"
 //******************************************************************************
 #ifdef _M_IX86
 #define MONITOR_MODULE_NAME _T("iMonitor.dll")
@@ -71,23 +72,6 @@ interface IMonitorCallback
 	virtual void			OnCallback			(IMonitorMessage* Message) = 0;
 };
 //******************************************************************************
-interface IMonitorRuleCallback
-{
-	enum emMatchStatus {
-		emMatchStatusBreak,
-		emMatchStatusContinue,
-	};
-
-	virtual void			OnBeginMatch		(IMonitorMessage* Message) {}
-	virtual void			OnFinishMatch		(IMonitorMessage* Message) {}
-	virtual emMatchStatus	OnMatch				(IMonitorMessage* Message, const char* GroupName, const char* RuleName, ULONG Action, const char* ActionParam) = 0;
-};
-//******************************************************************************
-interface __declspec(uuid("51237525-2811-4BE2-A6A3-D8889E0D0CA1")) IMonitorRuleEngine : public IUnknown
-{
-	virtual void			Match				(IMonitorMessage* Message, IMonitorRuleCallback* Callback) = 0;
-};
-//******************************************************************************
 interface __declspec (uuid("51237525-2811-4BE2-A6A3-D8889E0D0CA0")) IMonitorManager : public IUnknown
 {
 	virtual HRESULT			Start				(IMonitorCallbackInternal* Callback) = 0;
@@ -95,7 +79,8 @@ interface __declspec (uuid("51237525-2811-4BE2-A6A3-D8889E0D0CA0")) IMonitorMana
 	virtual HRESULT			Control				(PVOID Data, ULONG Length, PVOID OutData = NULL, ULONG OutLength = 0, PULONG ReturnLength = NULL) = 0;
 	virtual HRESULT			Stop				(void) = 0;
 
-	virtual	HRESULT			CreateRuleEngine	(LPCWSTR Path, IMonitorRuleEngine** Engine) = 0;
+	virtual	HRESULT			CreateRuleService	(LPCWSTR Path, IRuleService** Service) = 0;
+	virtual HRESULT			CreateAgentService	(ULONG MaxThread, IAgentService** Service) = 0;
 };
 //******************************************************************************
 //
@@ -148,18 +133,32 @@ public:
 		return m_Monitor->Control((PVOID)&config, sizeof(config));
 	}
 
-	CComPtr<IMonitorRuleEngine> CreateRuleEngine(LPCWSTR Path)
+	CComPtr<IRuleService> CreateRuleService(LPCWSTR Path)
 	{
 		if (!m_Monitor)
 			return NULL;
 
-		CComPtr<IMonitorRuleEngine> engine;
-		HRESULT hr = m_Monitor->CreateRuleEngine(Path, &engine);
+		CComPtr<IRuleService> service;
+		HRESULT hr = m_Monitor->CreateRuleService(Path, &service);
 
 		if (hr != S_OK)
 			return NULL;
 
-		return engine;
+		return service;
+	}
+
+	CComPtr<IAgentService> CreateAgentService(ULONG MaxThread = 1)
+	{
+		if (!m_Monitor)
+			return NULL;
+
+		CComPtr<IAgentService> service;
+		HRESULT hr = m_Monitor->CreateAgentService(MaxThread, &service);
+
+		if (hr != S_OK)
+			return NULL;
+
+		return service;
 	}
 
 protected:

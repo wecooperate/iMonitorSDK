@@ -91,8 +91,7 @@ class MonitorCallback : public IMonitorCallback
 {
 public:
 	void OnCallback(IMonitorMessage* Message) override
-	{
-	}
+	{}
 };
 
 int main()
@@ -239,7 +238,7 @@ int main()
 | 内核对象定制       |              | ✔                            | ✔            |
 | 配置签发           |              | ✔                            | ✔            |
 | 规则引擎           |              | ✔                            | ✔            |
-| Javascript脚本支持 |              | ✔                            | ✔            |
+| Javascript脚本支持 |              |                              | ✔            |
 | Linux支持          |              |                              | ✔            |
 | MacOS支持          |              |                              | ✔            |
 | 源码               |              |                              | ✔            |
@@ -247,10 +246,17 @@ int main()
 
 [授权请通过邮箱（iMonitor@qq.com）联系。](mailto://iMonitor@qq.com)
 
-## 加入我们
+## 使用本SDK的产品
+
+- [iMonitor 冰镜 - 终端行为分析系统](https://github.com/wecooperate/iMonitor)
+- [iDefender 冰盾 - 终端主动防御系统](https://github.com/wecooperate/iDefender)
+
+## 关于我们
 
 优秀的人，做专业的事。
 
 创信长荣科技是一家致力于为企业管理提供基础服务、一体化管理平台，力争成为企业管理入口，促进企业管理标准化、数字化的企业。我们的目标是拒绝内卷，让每个人更好的工作和生活。
 
-我们的成员有来自金山、360、腾讯等企业的优秀人才，具备深厚的技术水平。目前正在创业筹划中，现在加入有可能成为创始合伙人。无论是内核开发、架构设计、前端后台，只要是优秀的人，我们都需要你。
+我们的成员是来自金山、360、腾讯等企业的顶级优秀人才，具备深厚的技术水平。多款核心产品正在研发中，需要各方面人才的人才和资本投入。
+
+[联系我们](mailto://iMonitor@qq.com)

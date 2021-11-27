@@ -200,7 +200,7 @@ More examples can refer to the sample directory.
 Functional differences of different licenses:
 
 | Function description | Free License | Enterprise License | Enterprise Custom License |
-| ------------------ | ------------ | ----------------- ----------- | ------------ |
+| -------------------- | ------------ | ------------------ | ------------------------- |
 | Process Monitoring | ✔ | ✔ | ✔ |
 | File Monitoring | ✔ | ✔ | ✔ |
 | Registry Monitoring | ✔ | ✔ | ✔ |

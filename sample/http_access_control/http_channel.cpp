@@ -5,7 +5,6 @@
 
 --*/
 //******************************************************************************
-#include "stdafx.h"
 #include "http_channel.h"
 #include <sstream>
 //******************************************************************************
@@ -134,7 +133,7 @@ void HTTPChannelManager::OnLocalReceive(IAgentChannel* Channel, const char* Data
 	if (!http_channel)
 		return;
 
-	http_channel->OnLocalReceive(Data, Length);
+	http_channel->OnLocalReceive(Data, (ULONG)Length);
 }
 
 bool HTTPChannelManager::OnLocalSSLHello(IAgentChannel* Channel, const char* ServerName)

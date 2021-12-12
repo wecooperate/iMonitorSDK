@@ -8,19 +8,19 @@
 //******************************************************************************
 class MonitorCallback
 	: public IMonitorCallback
-	, public IRuleCallback
+	, public IMonitorRuleCallback
 {
 public:
 	void OnCallback(IMonitorMessage* Message) override
 	{
-		m_RuleService->Match(Message, this);
+		m_RuleEngine->Match(Message, this);
 	}
 
-	emMatchStatus OnMatch(IMonitorMessage* Message, const char* GroupName, const char* RuleName, ULONG Action, const char* ActionParam) override
+	emMatchStatus OnMatch(IMonitorMessage* Message, const MatchResult& Result) override
 	{
-		if (Action & emMSGActionBlock) {
+		if (Result.Action & emMSGActionBlock) {
 			Message->SetBlock();
-			printf("match block rule %s.%s\n", GroupName, RuleName);
+			printf("match block rule %s.%s\n", Result.GroupName, Result.RuleName);
 			return emMatchStatusBreak;
 		}
 
@@ -28,7 +28,7 @@ public:
 	}
 
 public:
-	CComPtr<IRuleService> m_RuleService;
+	CComPtr<IMonitorRuleEngine> m_RuleEngine;
 };
 //******************************************************************************
 int main()
@@ -48,9 +48,9 @@ int main()
 	PathRemoveFileSpec(rule_path);
 	PathAppend(rule_path, L"iMonitor.rule");
 
-	callback.m_RuleService = manager.CreateRuleService(rule_path);
+	callback.m_RuleEngine = manager.CreateRuleEngine(rule_path);
 
-	if (!callback.m_RuleService) {
+	if (!callback.m_RuleEngine) {
 		printf("load rule failed\n");
 		return 0;
 	}

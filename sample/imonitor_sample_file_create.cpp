@@ -51,6 +51,10 @@ int main()
 	config.Config[emMSGFileCreate] = emMSGConfigSend;
 	manager.InControl(config);
 
+	cxMSGUserSetSessionConfig sconfig;
+	sconfig.FilterFileCreateOnlyModifiable = TRUE;
+	manager.InControl(sconfig);
+
 	WaitForExit("保护带 .json 的文件不被修改、删除");
 
 	return 0;

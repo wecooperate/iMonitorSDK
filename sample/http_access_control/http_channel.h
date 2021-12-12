@@ -14,7 +14,7 @@
 class HTTPChannel : public cxHTTPParser
 {
 public:
-	void OnCreate(IAgentChannel* Channel);
+	void OnCreate(IMonitorAgentChannel* Channel);
 	void OnLocalReceive(const char* Data, ULONG Length);
 	void OnLocalSSLHello(const char* ServerName);
 	void OnClose(void);
@@ -29,18 +29,18 @@ protected:
 	void FinishRequest(http_status status, const std::string& data);
 
 protected:
-	IAgentChannel* m_channel = NULL;
+	IMonitorAgentChannel* m_channel = NULL;
 	bool m_parse_failed = false;
 	bool m_ssl = false;
 };
 //******************************************************************************
-class HTTPChannelManager : public IAgentCallback
+class HTTPChannelManager : public IMonitorAgentCallback
 {
 public:
-	void OnCreate(IAgentChannel* Channel) override;
-	void OnLocalReceive(IAgentChannel* Channel, const char* Data, size_t Length) override;
-	bool OnLocalSSLHello(IAgentChannel* Channel, const char* ServerName) override;
-	void OnClose(IAgentChannel* Channel) override;
+	void OnCreate(IMonitorAgentChannel* Channel) override;
+	void OnLocalReceive(IMonitorAgentChannel* Channel, const char* Data, size_t Length) override;
+	bool OnLocalSSLHello(IMonitorAgentChannel* Channel, const char* ServerName) override;
+	void OnClose(IMonitorAgentChannel* Channel) override;
 };
 //******************************************************************************
 #endif

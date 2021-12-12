@@ -26,7 +26,7 @@ public:
 
 		if (msg->Information() == FILE_CREATED) {
 			printf("new file : [%S] -> %S\n", msg->CurrentProcessPath(), msg->Path());
-		} else if (msg->Modify()) {
+		} else if (msg->GetHeader()->Modified) {
 			printf("mod file : [%S] -> %S\n", msg->CurrentProcessPath(), msg->Path());
 		}
 	}

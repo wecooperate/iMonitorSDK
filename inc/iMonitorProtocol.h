@@ -8,7 +8,7 @@
 #ifndef __iMonitorProtocol_FE59B1CD_4EA9_4705_963C_DED434EF01BD__
 #define __iMonitorProtocol_FE59B1CD_4EA9_4705_963C_DED434EF01BD__
 //******************************************************************************
-class cxMonitorMessage : public IMonitorMessage
+class MonitorMessage : public IMonitorMessage
 {
 public:
 	auto CurrentProcessCreateTime() { return GetTime(emMSGFieldCurrentProcessCreateTime); };
@@ -40,7 +40,7 @@ protected:
 	ULONGLONG GetTime(ULONG Index) { return GetULONGLONG(Index); }
 };
 //******************************************************************************
-class cxMSGProcessCreate : public cxMonitorMessage
+class cxMSGProcessCreate : public MonitorMessage
 {
 public:
 	enum {
@@ -74,7 +74,7 @@ public:
 	bool IsMatchParentPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldParentPath, Pattern); }
 	bool IsMatchParentCommandline(LPCWSTR Pattern) { return IsMatch(emMSGFieldParentCommandline, Pattern); }
 };
-class cxMSGProcessExit : public cxMonitorMessage
+class cxMSGProcessExit : public MonitorMessage
 {
 public:
 	enum {
@@ -93,7 +93,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGProcessOpen : public cxMonitorMessage
+class cxMSGProcessOpen : public MonitorMessage
 {
 public:
 	enum {
@@ -118,7 +118,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGThreadCreate : public cxMonitorMessage
+class cxMSGThreadCreate : public MonitorMessage
 {
 public:
 	enum {
@@ -143,7 +143,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGThreadExit : public cxMonitorMessage
+class cxMSGThreadExit : public MonitorMessage
 {
 public:
 	enum {
@@ -164,7 +164,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGThreadOpen : public cxMonitorMessage
+class cxMSGThreadOpen : public MonitorMessage
 {
 public:
 	enum {
@@ -191,7 +191,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGImageLoad : public cxMonitorMessage
+class cxMSGImageLoad : public MonitorMessage
 {
 public:
 	enum {
@@ -216,7 +216,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGProcessStart : public cxMonitorMessage
+class cxMSGProcessStart : public MonitorMessage
 {
 public:
 	enum {
@@ -250,7 +250,7 @@ public:
 	bool IsMatchParentPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldParentPath, Pattern); }
 	bool IsMatchParentCommandline(LPCWSTR Pattern) { return IsMatch(emMSGFieldParentCommandline, Pattern); }
 };
-class cxMSGThreadStart : public cxMonitorMessage
+class cxMSGThreadStart : public MonitorMessage
 {
 public:
 	enum {
@@ -275,7 +275,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFileCreate : public cxMonitorMessage
+class cxMSGFileCreate : public MonitorMessage
 {
 public:
 	enum {
@@ -302,7 +302,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFilePostCreate : public cxMonitorMessage
+class cxMSGFilePostCreate : public MonitorMessage
 {
 public:
 	enum {
@@ -331,7 +331,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFileQueryOpen : public cxMonitorMessage
+class cxMSGFileQueryOpen : public MonitorMessage
 {
 public:
 	enum {
@@ -348,7 +348,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFilePostQueryOpen : public cxMonitorMessage
+class cxMSGFilePostQueryOpen : public MonitorMessage
 {
 public:
 	enum {
@@ -377,7 +377,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFileCleanup : public cxMonitorMessage
+class cxMSGFileCleanup : public MonitorMessage
 {
 public:
 	enum {
@@ -388,17 +388,15 @@ public:
 		emMSGFieldCurrentProcessCommandline,
 		emMSGFieldPath,
 		emMSGFieldInformation,
-		emMSGFieldModify,
 	};
 
 public:
 	auto Path() { return GetPath(emMSGFieldPath); }
 	auto Information() { return GetULONG(emMSGFieldInformation); }
-	auto Modify() { return GetULONG(emMSGFieldModify); }
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFileCreateSection : public cxMonitorMessage
+class cxMSGFileCreateSection : public MonitorMessage
 {
 public:
 	enum {
@@ -417,7 +415,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFilePostCreateSection : public cxMonitorMessage
+class cxMSGFilePostCreateSection : public MonitorMessage
 {
 public:
 	enum {
@@ -436,7 +434,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFileRead : public cxMonitorMessage
+class cxMSGFileRead : public MonitorMessage
 {
 public:
 	enum {
@@ -459,7 +457,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFilePostRead : public cxMonitorMessage
+class cxMSGFilePostRead : public MonitorMessage
 {
 public:
 	enum {
@@ -484,7 +482,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFileWrite : public cxMonitorMessage
+class cxMSGFileWrite : public MonitorMessage
 {
 public:
 	enum {
@@ -509,7 +507,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFilePostWrite : public cxMonitorMessage
+class cxMSGFilePostWrite : public MonitorMessage
 {
 public:
 	enum {
@@ -536,7 +534,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFileCreateHardLink : public cxMonitorMessage
+class cxMSGFileCreateHardLink : public MonitorMessage
 {
 public:
 	enum {
@@ -558,7 +556,7 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchLinkPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldLinkPath, Pattern); }
 };
-class cxMSGFilePostCreateHardLink : public cxMonitorMessage
+class cxMSGFilePostCreateHardLink : public MonitorMessage
 {
 public:
 	enum {
@@ -580,7 +578,7 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchLinkPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldLinkPath, Pattern); }
 };
-class cxMSGFileRename : public cxMonitorMessage
+class cxMSGFileRename : public MonitorMessage
 {
 public:
 	enum {
@@ -602,7 +600,7 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchNewPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldNewPath, Pattern); }
 };
-class cxMSGFilePostRename : public cxMonitorMessage
+class cxMSGFilePostRename : public MonitorMessage
 {
 public:
 	enum {
@@ -624,7 +622,7 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchNewPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldNewPath, Pattern); }
 };
-class cxMSGFileDelete : public cxMonitorMessage
+class cxMSGFileDelete : public MonitorMessage
 {
 public:
 	enum {
@@ -641,7 +639,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFilePostDelete : public cxMonitorMessage
+class cxMSGFilePostDelete : public MonitorMessage
 {
 public:
 	enum {
@@ -658,28 +656,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFileSetSize : public cxMonitorMessage
-{
-public:
-	enum {
-		emMSGFieldCallstack,
-		emMSGFieldCurrentProcessCreateTime,
-		emMSGFieldCurrentProcessName,
-		emMSGFieldCurrentProcessPath,
-		emMSGFieldCurrentProcessCommandline,
-		emMSGFieldPath,
-		emMSGFieldSize,
-		emMSGFieldSizeType,
-	};
-
-public:
-	auto Path() { return GetPath(emMSGFieldPath); }
-	auto Size() { return GetULONGLONG(emMSGFieldSize); }
-	auto SizeType() { return GetULONG(emMSGFieldSizeType); }
-
-	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
-};
-class cxMSGFilePostSetSize : public cxMonitorMessage
+class cxMSGFileSetSize : public MonitorMessage
 {
 public:
 	enum {
@@ -700,7 +677,28 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFileSetBasicInfo : public cxMonitorMessage
+class cxMSGFilePostSetSize : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldSize,
+		emMSGFieldSizeType,
+	};
+
+public:
+	auto Path() { return GetPath(emMSGFieldPath); }
+	auto Size() { return GetULONGLONG(emMSGFieldSize); }
+	auto SizeType() { return GetULONG(emMSGFieldSizeType); }
+
+	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
+};
+class cxMSGFileSetBasicInfo : public MonitorMessage
 {
 public:
 	enum {
@@ -727,7 +725,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFilePostSetBasicInfo : public cxMonitorMessage
+class cxMSGFilePostSetBasicInfo : public MonitorMessage
 {
 public:
 	enum {
@@ -754,7 +752,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGFileFindFile : public cxMonitorMessage
+class cxMSGFileFindFile : public MonitorMessage
 {
 public:
 	enum {
@@ -776,7 +774,7 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchFindName(LPCWSTR Pattern) { return IsMatch(emMSGFieldFindName, Pattern); }
 };
-class cxMSGFilePostFindFile : public cxMonitorMessage
+class cxMSGFilePostFindFile : public MonitorMessage
 {
 public:
 	enum {
@@ -813,7 +811,7 @@ public:
 	bool IsMatchFindName(LPCWSTR Pattern) { return IsMatch(emMSGFieldFindName, Pattern); }
 	bool IsMatchFileName(LPCWSTR Pattern) { return IsMatch(emMSGFieldFileName, Pattern); }
 };
-class cxMSGRegCreateKey : public cxMonitorMessage
+class cxMSGRegCreateKey : public MonitorMessage
 {
 public:
 	enum {
@@ -834,7 +832,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGRegPostCreateKey : public cxMonitorMessage
+class cxMSGRegPostCreateKey : public MonitorMessage
 {
 public:
 	enum {
@@ -857,7 +855,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGRegOpenKey : public cxMonitorMessage
+class cxMSGRegOpenKey : public MonitorMessage
 {
 public:
 	enum {
@@ -878,7 +876,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGRegPostOpenKey : public cxMonitorMessage
+class cxMSGRegPostOpenKey : public MonitorMessage
 {
 public:
 	enum {
@@ -899,7 +897,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGRegDeleteKey : public cxMonitorMessage
+class cxMSGRegDeleteKey : public MonitorMessage
 {
 public:
 	enum {
@@ -916,7 +914,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGRegPostDeleteKey : public cxMonitorMessage
+class cxMSGRegPostDeleteKey : public MonitorMessage
 {
 public:
 	enum {
@@ -933,27 +931,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGRegRenameKey : public cxMonitorMessage
-{
-public:
-	enum {
-		emMSGFieldCallstack,
-		emMSGFieldCurrentProcessCreateTime,
-		emMSGFieldCurrentProcessName,
-		emMSGFieldCurrentProcessPath,
-		emMSGFieldCurrentProcessCommandline,
-		emMSGFieldPath,
-		emMSGFieldNewName,
-	};
-
-public:
-	auto Path() { return GetPath(emMSGFieldPath); }
-	auto NewName() { return GetString(emMSGFieldNewName); }
-
-	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
-	bool IsMatchNewName(LPCWSTR Pattern) { return IsMatch(emMSGFieldNewName, Pattern); }
-};
-class cxMSGRegPostRenameKey : public cxMonitorMessage
+class cxMSGRegRenameKey : public MonitorMessage
 {
 public:
 	enum {
@@ -973,7 +951,27 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchNewName(LPCWSTR Pattern) { return IsMatch(emMSGFieldNewName, Pattern); }
 };
-class cxMSGRegEnumKey : public cxMonitorMessage
+class cxMSGRegPostRenameKey : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldNewName,
+	};
+
+public:
+	auto Path() { return GetPath(emMSGFieldPath); }
+	auto NewName() { return GetString(emMSGFieldNewName); }
+
+	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
+	bool IsMatchNewName(LPCWSTR Pattern) { return IsMatch(emMSGFieldNewName, Pattern); }
+};
+class cxMSGRegEnumKey : public MonitorMessage
 {
 public:
 	enum {
@@ -996,7 +994,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGRegPostEnumKey : public cxMonitorMessage
+class cxMSGRegPostEnumKey : public MonitorMessage
 {
 public:
 	enum {
@@ -1023,7 +1021,7 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 };
-class cxMSGRegLoadKey : public cxMonitorMessage
+class cxMSGRegLoadKey : public MonitorMessage
 {
 public:
 	enum {
@@ -1043,7 +1041,7 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchFilePath(LPCWSTR Pattern) { return IsMatch(emMSGFieldFilePath, Pattern); }
 };
-class cxMSGRegPostLoadKey : public cxMonitorMessage
+class cxMSGRegPostLoadKey : public MonitorMessage
 {
 public:
 	enum {
@@ -1063,7 +1061,7 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchFilePath(LPCWSTR Pattern) { return IsMatch(emMSGFieldFilePath, Pattern); }
 };
-class cxMSGRegReplaceKey : public cxMonitorMessage
+class cxMSGRegReplaceKey : public MonitorMessage
 {
 public:
 	enum {
@@ -1086,7 +1084,7 @@ public:
 	bool IsMatchOldFilePath(LPCWSTR Pattern) { return IsMatch(emMSGFieldOldFilePath, Pattern); }
 	bool IsMatchNewFilePath(LPCWSTR Pattern) { return IsMatch(emMSGFieldNewFilePath, Pattern); }
 };
-class cxMSGRegPostReplaceKey : public cxMonitorMessage
+class cxMSGRegPostReplaceKey : public MonitorMessage
 {
 public:
 	enum {
@@ -1109,7 +1107,7 @@ public:
 	bool IsMatchOldFilePath(LPCWSTR Pattern) { return IsMatch(emMSGFieldOldFilePath, Pattern); }
 	bool IsMatchNewFilePath(LPCWSTR Pattern) { return IsMatch(emMSGFieldNewFilePath, Pattern); }
 };
-class cxMSGRegDeleteValue : public cxMonitorMessage
+class cxMSGRegDeleteValue : public MonitorMessage
 {
 public:
 	enum {
@@ -1129,7 +1127,7 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchValueName(LPCWSTR Pattern) { return IsMatch(emMSGFieldValueName, Pattern); }
 };
-class cxMSGRegPostDeleteValue : public cxMonitorMessage
+class cxMSGRegPostDeleteValue : public MonitorMessage
 {
 public:
 	enum {
@@ -1149,7 +1147,7 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchValueName(LPCWSTR Pattern) { return IsMatch(emMSGFieldValueName, Pattern); }
 };
-class cxMSGRegSetValue : public cxMonitorMessage
+class cxMSGRegSetValue : public MonitorMessage
 {
 public:
 	enum {
@@ -1173,7 +1171,7 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchValueName(LPCWSTR Pattern) { return IsMatch(emMSGFieldValueName, Pattern); }
 };
-class cxMSGRegPostSetValue : public cxMonitorMessage
+class cxMSGRegPostSetValue : public MonitorMessage
 {
 public:
 	enum {
@@ -1197,7 +1195,7 @@ public:
 	bool IsMatchPath(LPCWSTR Pattern) { return IsMatch(emMSGFieldPath, Pattern); }
 	bool IsMatchValueName(LPCWSTR Pattern) { return IsMatch(emMSGFieldValueName, Pattern); }
 };
-class cxMSGSocketCreate : public cxMonitorMessage
+class cxMSGSocketCreate : public MonitorMessage
 {
 public:
 	enum {
@@ -1213,7 +1211,7 @@ public:
 	auto SocketObject() { return GetULONGLONG(emMSGFieldSocketObject); }
 
 };
-class cxMSGSocketControl : public cxMonitorMessage
+class cxMSGSocketControl : public MonitorMessage
 {
 public:
 	enum {
@@ -1237,7 +1235,7 @@ public:
 	auto InputData() { return GetBinary(emMSGFieldInputData); }
 
 };
-class cxMSGSocketPostControl : public cxMonitorMessage
+class cxMSGSocketPostControl : public MonitorMessage
 {
 public:
 	enum {
@@ -1263,7 +1261,7 @@ public:
 	auto OutputData() { return GetBinary(emMSGFieldOutputData); }
 
 };
-class cxMSGSocketConnect : public cxMonitorMessage
+class cxMSGSocketConnect : public MonitorMessage
 {
 public:
 	enum {
@@ -1289,7 +1287,7 @@ public:
 	auto SuperConnect() { return GetBool(emMSGFieldSuperConnect); }
 
 };
-class cxMSGSocketPostConnect : public cxMonitorMessage
+class cxMSGSocketPostConnect : public MonitorMessage
 {
 public:
 	enum {
@@ -1315,7 +1313,7 @@ public:
 	auto SuperConnect() { return GetBool(emMSGFieldSuperConnect); }
 
 };
-class cxMSGSocketSend : public cxMonitorMessage
+class cxMSGSocketSend : public MonitorMessage
 {
 public:
 	enum {
@@ -1343,7 +1341,7 @@ public:
 	auto Data() { return GetBinary(emMSGFieldData); }
 
 };
-class cxMSGSocketRecv : public cxMonitorMessage
+class cxMSGSocketRecv : public MonitorMessage
 {
 public:
 	enum {
@@ -1367,35 +1365,7 @@ public:
 	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
 
 };
-class cxMSGSocketPostRecv : public cxMonitorMessage
-{
-public:
-	enum {
-		emMSGFieldCallstack,
-		emMSGFieldCurrentProcessCreateTime,
-		emMSGFieldCurrentProcessName,
-		emMSGFieldCurrentProcessPath,
-		emMSGFieldCurrentProcessCommandline,
-		emMSGFieldSocketObject,
-		emMSGFieldIP,
-		emMSGFieldPort,
-		emMSGFieldLocalIP,
-		emMSGFieldLocalPort,
-		emMSGFieldDataLength,
-		emMSGFieldData,
-	};
-
-public:
-	auto SocketObject() { return GetULONGLONG(emMSGFieldSocketObject); }
-	auto IP() { return GetSocketIP(emMSGFieldIP); }
-	auto Port() { return GetSocketPort(emMSGFieldPort); }
-	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
-	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
-	auto DataLength() { return GetULONG(emMSGFieldDataLength); }
-	auto Data() { return GetBinary(emMSGFieldData); }
-
-};
-class cxMSGSocketSendTo : public cxMonitorMessage
+class cxMSGSocketPostRecv : public MonitorMessage
 {
 public:
 	enum {
@@ -1423,31 +1393,7 @@ public:
 	auto Data() { return GetBinary(emMSGFieldData); }
 
 };
-class cxMSGSocketRecvFrom : public cxMonitorMessage
-{
-public:
-	enum {
-		emMSGFieldCallstack,
-		emMSGFieldCurrentProcessCreateTime,
-		emMSGFieldCurrentProcessName,
-		emMSGFieldCurrentProcessPath,
-		emMSGFieldCurrentProcessCommandline,
-		emMSGFieldSocketObject,
-		emMSGFieldIP,
-		emMSGFieldPort,
-		emMSGFieldLocalIP,
-		emMSGFieldLocalPort,
-	};
-
-public:
-	auto SocketObject() { return GetULONGLONG(emMSGFieldSocketObject); }
-	auto IP() { return GetSocketIP(emMSGFieldIP); }
-	auto Port() { return GetSocketPort(emMSGFieldPort); }
-	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
-	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
-
-};
-class cxMSGSocketPostRecvFrom : public cxMonitorMessage
+class cxMSGSocketSendTo : public MonitorMessage
 {
 public:
 	enum {
@@ -1475,47 +1421,7 @@ public:
 	auto Data() { return GetBinary(emMSGFieldData); }
 
 };
-class cxMSGSocketListen : public cxMonitorMessage
-{
-public:
-	enum {
-		emMSGFieldCallstack,
-		emMSGFieldCurrentProcessCreateTime,
-		emMSGFieldCurrentProcessName,
-		emMSGFieldCurrentProcessPath,
-		emMSGFieldCurrentProcessCommandline,
-		emMSGFieldSocketObject,
-		emMSGFieldIP,
-		emMSGFieldPort,
-	};
-
-public:
-	auto SocketObject() { return GetULONGLONG(emMSGFieldSocketObject); }
-	auto IP() { return GetSocketIP(emMSGFieldIP); }
-	auto Port() { return GetSocketPort(emMSGFieldPort); }
-
-};
-class cxMSGSocketPostListen : public cxMonitorMessage
-{
-public:
-	enum {
-		emMSGFieldCallstack,
-		emMSGFieldCurrentProcessCreateTime,
-		emMSGFieldCurrentProcessName,
-		emMSGFieldCurrentProcessPath,
-		emMSGFieldCurrentProcessCommandline,
-		emMSGFieldSocketObject,
-		emMSGFieldIP,
-		emMSGFieldPort,
-	};
-
-public:
-	auto SocketObject() { return GetULONGLONG(emMSGFieldSocketObject); }
-	auto IP() { return GetSocketIP(emMSGFieldIP); }
-	auto Port() { return GetSocketPort(emMSGFieldPort); }
-
-};
-class cxMSGSocketAccept : public cxMonitorMessage
+class cxMSGSocketRecvFrom : public MonitorMessage
 {
 public:
 	enum {
@@ -1539,7 +1445,75 @@ public:
 	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
 
 };
-class cxMSGSocketPostAccept : public cxMonitorMessage
+class cxMSGSocketPostRecvFrom : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldSocketObject,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+		emMSGFieldDataLength,
+		emMSGFieldData,
+	};
+
+public:
+	auto SocketObject() { return GetULONGLONG(emMSGFieldSocketObject); }
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+	auto DataLength() { return GetULONG(emMSGFieldDataLength); }
+	auto Data() { return GetBinary(emMSGFieldData); }
+
+};
+class cxMSGSocketListen : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldSocketObject,
+		emMSGFieldIP,
+		emMSGFieldPort,
+	};
+
+public:
+	auto SocketObject() { return GetULONGLONG(emMSGFieldSocketObject); }
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+
+};
+class cxMSGSocketPostListen : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldSocketObject,
+		emMSGFieldIP,
+		emMSGFieldPort,
+	};
+
+public:
+	auto SocketObject() { return GetULONGLONG(emMSGFieldSocketObject); }
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+
+};
+class cxMSGSocketAccept : public MonitorMessage
 {
 public:
 	enum {
@@ -1563,7 +1537,31 @@ public:
 	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
 
 };
-class cxMSGWFPTcpConnect : public cxMonitorMessage
+class cxMSGSocketPostAccept : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldSocketObject,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+	};
+
+public:
+	auto SocketObject() { return GetULONGLONG(emMSGFieldSocketObject); }
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+
+};
+class cxMSGWFPTcpConnect : public MonitorMessage
 {
 public:
 	enum {
@@ -1585,7 +1583,7 @@ public:
 	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
 
 };
-class cxMSGWFPUdpConnect : public cxMonitorMessage
+class cxMSGWFPUdpConnect : public MonitorMessage
 {
 public:
 	enum {

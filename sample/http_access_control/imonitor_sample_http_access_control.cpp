@@ -19,12 +19,12 @@ public:
 		if (Message->GetType() != emMSGWFPTcpConnect)
 			return;
 
-		m_AgentService->Agent(Message, &m_HTTPManager, true);
+		m_AgentEngine->Agent(Message, &m_HTTPManager, true);
 	}
 
 public:
 	HTTPChannelManager m_HTTPManager;
-	CComPtr<IAgentService> m_AgentService;
+	CComPtr<IMonitorAgentEngine> m_AgentEngine;
 };
 //******************************************************************************
 int main()
@@ -39,9 +39,9 @@ int main()
 		return 0;
 	}
 
-	callback.m_AgentService = manager.CreateAgentService();
+	callback.m_AgentEngine = manager.CreateAgentEngine();
 
-	if (!callback.m_AgentService) {
+	if (!callback.m_AgentEngine) {
 		printf("create agent service failed\n");
 		return 0;
 	}

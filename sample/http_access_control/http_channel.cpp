@@ -8,7 +8,7 @@
 #include "http_channel.h"
 #include <sstream>
 //******************************************************************************
-void HTTPChannel::OnCreate(IAgentChannel* Channel)
+void HTTPChannel::OnCreate(IMonitorAgentChannel* Channel)
 {
 	m_channel = Channel;
 
@@ -117,7 +117,7 @@ void HTTPChannel::FinishRequest(http_status status, const std::string& data)
 	m_channel->Close();
 }
 
-void HTTPChannelManager::OnCreate(IAgentChannel* Channel)
+void HTTPChannelManager::OnCreate(IMonitorAgentChannel* Channel)
 {
 	HTTPChannel* http_channel = new HTTPChannel;
 
@@ -126,7 +126,7 @@ void HTTPChannelManager::OnCreate(IAgentChannel* Channel)
 	http_channel->OnCreate(Channel);
 }
 
-void HTTPChannelManager::OnLocalReceive(IAgentChannel* Channel, const char* Data, size_t Length)
+void HTTPChannelManager::OnLocalReceive(IMonitorAgentChannel* Channel, const char* Data, size_t Length)
 {
 	HTTPChannel* http_channel = static_cast<HTTPChannel*>(Channel->GetContext());
 
@@ -136,7 +136,7 @@ void HTTPChannelManager::OnLocalReceive(IAgentChannel* Channel, const char* Data
 	http_channel->OnLocalReceive(Data, (ULONG)Length);
 }
 
-bool HTTPChannelManager::OnLocalSSLHello(IAgentChannel* Channel, const char* ServerName)
+bool HTTPChannelManager::OnLocalSSLHello(IMonitorAgentChannel* Channel, const char* ServerName)
 {
 	HTTPChannel* http_channel = static_cast<HTTPChannel*>(Channel->GetContext());
 
@@ -148,7 +148,7 @@ bool HTTPChannelManager::OnLocalSSLHello(IAgentChannel* Channel, const char* Ser
 	return true;
 }
 
-void HTTPChannelManager::OnClose(IAgentChannel* Channel)
+void HTTPChannelManager::OnClose(IMonitorAgentChannel* Channel)
 {
 	HTTPChannel* http_channel = static_cast<HTTPChannel*>(Channel->GetContext());
 

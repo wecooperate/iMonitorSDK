@@ -1,40 +1,9 @@
-## Table of Contents
-
-*   [头文件说明](#头文件说明)
-*   [接口说明](#接口说明)
-    *   [IMonitorManager](#imonitormanager)
-    *   [IMonitorCallback](#imonitorcallback)
-    *   [IMonitorCallbackInternal](#imonitorcallbackinternal)
-    *   [IMonitorMessage](#imonitormessage)
-*   [驱动配置](#驱动配置)
-    *   [支持的配置参数：](#支持的配置参数)
-    *   [SDK带的默认配置如下](#sdk带的默认配置如下)
-    *   [快速使用演示](#快速使用演示)
-*   [规则引擎](#规则引擎)
-    *   [接口说明](#接口说明-1)
-    *   [使用说明](#使用说明)
-    *   [规则文件说明](#规则文件说明)
-        *   [规则组](#规则组)
-        *   [规则](#规则)
-        *   [规则匹配条件](#规则匹配条件)
-*   [网络代理](#网络代理)
-    *   [上网行为管理示例（sample/http\_access\_control）](#上网行为管理示例samplehttp\_access\_control)
-    *   [接口说明](#接口说明-2)
-        *   [IAgentService](#iagentservice)
-        *   [IAgentCallback](#iagentcallback)
-        *   [IAgentChannel](#iagentchannel)
-*   [版本说明](#版本说明)
-    *   [1.0.2.0](#1020)
-    *   [1.0.1.0](#1010)
-*   [附录](#附录)
-    *   [协议字段](#协议字段)
-    *   [协议编译](#协议编译)
-
 ## 头文件说明
 
 -   iMonitor.h 驱动、应用层共用的定义
 -   iMonitorSDK.h SDK接口定义
 -   iMonitorProtocol.h idl自动生成的协议辅助类
+-   iMonitorSDKExtesnion.h 基于SDK在应用层实现的扩展功能
 
 ## 接口说明
 
@@ -50,17 +19,17 @@ interface IMonitorManager : public IUnknown
 	virtual HRESULT			Control				(PVOID Data, ULONG Length, PVOID OutData, ULONG OutLength, PULONG ReturnLength) = 0;
 	virtual HRESULT			Stop				(void) = 0;
 	
-	virtual	HRESULT			CreateRuleService	(LPCWSTR Path, IRuleService** Service) = 0;
-	virtual	HRESULT			CreateAgentService	(ULONG MaxThread, IAgentService** Service) = 0;
+	virtual	HRESULT			CreateRuleEngine	(LPCWSTR Path, IMonitorRuleEngine** Engine) = 0;
+	virtual	HRESULT			CreateAgentEngine	(ULONG MaxThread, IMonitorAgentEngine** Engine) = 0;
 };
 ```
 
-| 函数               | 说明                                                  |
-| ------------------ | ----------------------------------------------------- |
-| Start              | 设置驱动回调、安装并启动驱动                          |
-| Control            | 跟驱动通讯的入口，详细参考cxMSGUserXxxx结构体         |
-| CreateRuleService  | 加载基于jsonlogic的规则引擎，详细参考**规则引擎**部分 |
-| CreateAgentService | 创建网络中间人服务器，详细参考**网络代理**部分        |
+| 函数              | 说明                                                  |
+| ----------------- | ----------------------------------------------------- |
+| Start             | 设置驱动回调、安装并启动驱动                          |
+| Control           | 跟驱动通讯的入口，详细参考cxMSGUserXxxx结构体         |
+| CreateRuleEngine  | 加载基于jsonlogic的规则引擎，详细参考**规则引擎**部分 |
+| CreateAgentEngine | 创建网络中间人服务器，详细参考**网络代理**部分        |
 
 支持的Control操作：
 
@@ -68,6 +37,8 @@ interface IMonitorManager : public IUnknown
 | ----------------------------- | ---------------------------------------------- |
 | cxMSGUserSetGlobalConfig      | 设置全局配置                                   |
 | cxMSGUserGetGlobalConfig      | 获取全局配置                                   |
+| cxMSGUserSetSessionConfig     | 设置当前会话配置                               |
+| cxMSGUserGetSessionConfig     | 获取当前配置会话                               |
 | **cxMSGUserSetMSGConfig**     | 设置监控消息配置，开启监控都通过这个命令字设置 |
 | cxMSGUserGetMSGConfig         | 获取监控消息配置                               |
 | cxMSGUserEnableProtect        | 开启自保护                                     |
@@ -264,21 +235,29 @@ int main()
 ### 接口说明
 
 ```c++
-interface IRuleCallback
+interface IMonitorRuleCallback
 {
 	enum emMatchStatus {
 		emMatchStatusBreak,
 		emMatchStatusContinue,
 	};
 
+	struct MatchResult {
+		ULONG				Action;
+		const char*			ActionParam;
+		const char*			GroupName;
+		const char*			RuleName;
+	};
+
 	virtual void			OnBeginMatch		(IMonitorMessage* Message) {}
 	virtual void			OnFinishMatch		(IMonitorMessage* Message) {}
-	virtual emMatchStatus	OnMatch				(IMonitorMessage* Message, const char* GroupName, const char* RuleName, ULONG Action, const char* ActionParam) = 0;
+	virtual emMatchStatus	OnMatch				(IMonitorMessage* Message, const MatchResult& Result) = 0;
 };
 
-interface IRuleService : public IUnknown
+interface IMonitorRuleEngine : public IUnknown
 {
-	virtual void			Match				(IMonitorMessage* Message, IRuleCallback* Callback) = 0;
+	virtual void			Match				(IMonitorMessage* Message, IMonitorRuleCallback* Callback) = 0;
+    virtual void			EnumAffectedMessage	(void(*Callback)(ULONG Type, void* Context), void* Context) = 0;
 };
 ```
 
@@ -287,19 +266,19 @@ interface IRuleService : public IUnknown
 ```c++
 class MonitorCallback
 	: public IMonitorCallback
-	, public IRuleCallback
+	, public IMonitorRuleCallback
 {
 public:
 	void OnCallback(IMonitorMessage* Message) override
 	{
-		m_RuleService->Match(Message, this);
+		m_RuleEngine->Match(Message, this);
 	}
 
-	emMatchStatus OnMatch(IMonitorMessage* Message, const char* GroupName, const char* RuleName, ULONG Action, const char* ActionParam) override
+	emMatchStatus OnMatch(IMonitorMessage* Message, const MatchResult& Result) override
 	{
-		if (Action & emMSGActionBlock) {
+		if (Result.Action & emMSGActionBlock) {
 			Message->SetBlock();
-			printf("match block rule %s.%s\n", GroupName, RuleName);
+			printf("match block rule %s.%s\n", Result.GroupName, Result.RuleName);
 			return emMatchStatusBreak;
 		}
 
@@ -307,7 +286,7 @@ public:
 	}
 
 public:
-	CComPtr<IRuleService> m_RuleService;
+	CComPtr<IMonitorRuleEngine> m_RuleEngine;
 };
 ```
 
@@ -328,7 +307,7 @@ public:
 			"name" : "block notepad",
 			"action" : 1,
 			"action_param" : "",
-			"message" : ["ProcessCreate", "ProcessOpen"],
+			"event" : ["ProcessCreate", "ProcessOpen"],
 			"matcher" : {
 				"or" : [
 					{"match" : ["Path", "*notepad.exe"]  }
@@ -354,7 +333,7 @@ public:
 | name         | 规则名                                                       |
 | action       | 匹配后的动作，在回调里面使用                                 |
 | action_param | 匹配后的动作参数                                             |
-| message      | 数组，表示当前规则针对哪些消息类型有效，如果是 * 表示所有类型 |
+| event        | 数组或者字符串，表示当前规则针对哪些消息类型有效；如果是字符串并且是 * 表示全部的事件 |
 | matcher      | 匹配条件                                                     |
 
 #### 规则匹配条件
@@ -369,23 +348,24 @@ public:
 >
 > value表示匹配的值，具体类型参考operator
 
-| operator | value类型 | 说明                                 |
-| -------- | --------- | ------------------------------------ |
-| or       | array     | 表示数组下任意规则匹配               |
-| and      | array     | 表示数组下全部规则匹配               |
-| bool     | bool      | 直接返回value的值                    |
-| match    | string    | 表示通配符的字符串匹配，忽略大小写   |
-| !match   | string    | match的相反                          |
-| MATCH    | string    | 表示通配符的字符串匹配，忽略大小敏感 |
-| !MATCH   | string    | MATCH的相反                          |
-| ==       | number    | 等于                                 |
-| !=       | number    | 不等于                               |
-| >        | number    | 大于                                 |
-| <        | number    | 小于                                 |
-| >=       | number    | 大于等于                             |
-| <=       | number    | 小于等于                             |
-| &        | number    | 包含                                 |
-| !&       | number    | 不包含                               |
+| operator | value类型 | 说明                                           |
+| -------- | --------- | ---------------------------------------------- |
+| child    | struct    | 子节点匹配，支持 CurrentProcess、Process、File |
+| or       | array     | 表示数组下任意规则匹配                         |
+| and      | array     | 表示数组下全部规则匹配                         |
+| bool     | bool      | 直接返回value的值                              |
+| equal    | string    | 字符串相等                                     |
+| !equal   | string    | 字符串不相等                                   |
+| match    | string    | 表示通配符的字符串匹配，忽略大小写             |
+| !match   | string    | match的相反                                    |
+| ==       | number    | 等于                                           |
+| !=       | number    | 不等于                                         |
+| >        | number    | 大于                                           |
+| <        | number    | 小于                                           |
+| >=       | number    | 大于等于                                       |
+| <=       | number    | 小于等于                                       |
+| &        | number    | 包含                                           |
+| !&       | number    | 不包含                                         |
 
 ## 网络代理
 
@@ -399,28 +379,28 @@ public:
 
 ### 接口说明
 
-#### IAgentService
+#### IMonitorAgentEngine
 
 ```
-interface IAgentService : public IUnknown
+interface IMonitorAgentEngine : public IUnknown
 {
-	virtual bool			Agent				(IMonitorMessage* Message, IAgentCallback* Callback, bool SSL = false) = 0;
+	virtual bool			Agent				(IMonitorMessage* Message, IMonitorAgentCallback* Callback, bool SSL = false) = 0;
 };
 
-HRESULT	 CreateAgentService	(ULONG MaxThread, IAgentService** Service);
+HRESULT	 CreateAgentEngine	(ULONG MaxThread, IMonitorAgentEngine** Engine);
 ```
 
-| 函数               | 说明                                                         |
-| ------------------ | ------------------------------------------------------------ |
-| CreateAgentService | 创建代理服务，MaxThread表示并发的线程数，默认是1，最大是10。SDK会为每一个线程创建一个独立监听端口。同一个连接的回调都是在单线程触发。 |
-| Agent              | 建立代理，只支持SocketConnect、WFPTcpConnect的消息类型，并且需要是Wating状态的。 |
+| 函数              | 说明                                                         |
+| ----------------- | ------------------------------------------------------------ |
+| CreateAgentEngine | 创建代理引擎，MaxThread表示并发的线程数，默认是1，最大是10。SDK会为每一个线程创建一个独立监听端口。同一个连接的回调都是在单线程触发。 |
+| Agent             | 建立代理，只支持SocketConnect、WFPTcpConnect的消息类型，并且需要是Wating状态的。 |
 
 代理建立后，所有的事件通过IAgentCallback触发。
 
-#### IAgentCallback
+#### IMonitorAgentCallback
 
 ```
-interface IAgentCallback
+interface IMonitorAgentCallback
 {
 	virtual void			OnCreate			(IAgentChannel* Channel) {}
 
@@ -454,10 +434,10 @@ interface IAgentCallback
 
 client（本地客户端，比如浏览器） --> Agent --> remote(远程网络)
 
-#### IAgentChannel
+#### IMonitorAgentChannel
 
 ```
-interface IAgentChannel
+interface IMonitorAgentChannel
 {
 	struct Address {
 		ULONG				IP;
@@ -506,6 +486,18 @@ interface IAgentChannel
 | SSLIsFallback        | 如果设置了ssl，但是解析后发现不是ssl的，会回退到原始数据包的状态，这里判断是否回退过。 |
 
 ## 版本说明
+
+### 1.0.3.0
+
+驱动：
+
+添加对打开进程、文件等频繁操作添加快速过滤支持
+添加应用处理事件超时导致系统卡住的熔断机制
+添加回话超时配置，不同的应用程序可以设置不同的超时
+
+应用层：
+
+优化规则过滤：添加匹配缓存、添加扩展子节点
 
 ### 1.0.2.0
 

@@ -1,36 +1,41 @@
-English| [简体中文](./README-zh_CN.md)
+[English](./README_EN.md)
 
-## Introduction
+## 简介
 
-iMonitorSDK is a development kit that provides system behavior monitoring for terminals and the cloud. Help industry applications such as security, management, and auditing can quickly implement necessary functions without worrying about underlying driver development, maintenance, and compatibility issues, allowing them to focus on business development.
+iMonitorSDK是一款为终端、云端提供系统行为监控的开发套件。
 
-iMonitorSDK also supports monitoring of processes, files, registry, network, system, etc., using standard and stable implementation methods, and also supports Windows (XP-Win11), Linux, and MacOS.
+旨在帮助安全、管理、审计等行业应用可以快速实现必要功能，而不用关心底层驱动的开发、维护和兼容性问题，让其可以专注于业务开发。
 
-With iMonitorSDK, common terminal security functions such as self-protection, process interception, ransomware defense, active defense, and Internet behavior management can be realized at a very low cost.
+iMonitorSDK同时支持进程、文件、注册表、网络、系统等的监控，使用标准稳定的实现方式，同时支持Windows（XP-Win11）、Linux、MacOS。
 
-### ✨ Core Functions
+利用iMonitorSDK可以极低成本的实现自保护、进程拦截、勒索病毒防御、主动防御、上网行为管理等等终端安全常见的功能。
 
-- Process, File, Registry Protection
+### ✨ 具备如下核心功能
 
-- Process startup, module loading interception, module injection
+- 进程、文件、注册表保护
 
-- File interception and redirection
+- 进程启动、模块加载拦截，模块注入
 
-- Network firewall, traffic proxy, protocol analysis
-- Rule engine, script support
+- 文件拦截、重定向
 
-### 📦 Applicable to the following products
+- 网络防火墙、流量代理、协议分析
+- 规则引擎、动态脚本
 
-- Endpoint Security Management System
-- EDR
-- HIPS
-- Cloud Security
-- Zero trust
-- Internet Access Control
+### 📦 适用于如下的产品
 
-## 🔨 Quick start
+- 主动防御
 
-Example 1: Process start interception
+- 终端管控
+
+- 入侵检测
+- 主机安全
+- 零信任
+
+- 上网行为管理
+
+## 🔨 快速入门
+
+示例一：进程启动拦截
 
 ```c++
 class MonitorCallback : public IMonitorCallback
@@ -44,7 +49,7 @@ public:
 		cxMSGProcessCreate* msg = (cxMSGProcessCreate*)Message;
 
 		//
-		// Block the process of the process name cmd.exe from starting
+		// 禁止进程名 cmd.exe 的进程启动
 		//
 
 		if (msg->IsMatchPath(L"*\\cmd.exe"))
@@ -68,13 +73,13 @@ int main()
 	config.Config[emMSGProcessCreate] = emMSGConfigSend;
 	manager.InControl(config);
 
-	WaitForExit("Block the process of the process name cmd.exe from starting");
+	WaitForExit("禁止进程名 cmd.exe 的进程启动");
 
 	return 0;
 }
 ```
 
-Example 2: Self-protection
+示例二：自保护规则设置
 
 ```c++
 class MonitorCallback : public IMonitorCallback
@@ -98,7 +103,16 @@ int main()
 
 	manager.InControl(cxMSGUserEnableProtect());
 
+	//
+	// Path路径支持通配符
+	//	* 表示任意n个字符
+	//	? 表示任意一个字符
+	//	> 用于字符串结尾，表示字符串结束或者是\\结尾，用于目录判断（比如protect> 匹配 protect 和 protect\\*）
+	//
 	{
+		//
+		// 添加进程、文件保护： 保护进程名是notepad.exe的进程不被结束、文件不被修改、删除
+		//
 		cxMSGUserAddProtectRule rule;
 		rule.ProtectType = emProtectTypeProcessPath | emProtectTypeFilePath;
 		wcsncpy(rule.Path, L"*\\notepad.exe", MONITOR_MAX_BUFFER);
@@ -106,6 +120,9 @@ int main()
 	}
 
 	{
+		//
+		// 添加文件夹保护： 保护protect目录下面的文件不被外部修改、目录不被重命名、删除
+		//
 		cxMSGUserAddProtectRule rule;
 		rule.ProtectType = emProtectTypeFilePath;
 		wcsncpy(rule.Path, L"*\\protect>", MONITOR_MAX_BUFFER);
@@ -113,6 +130,9 @@ int main()
 	}
 
 	{
+		//
+		// 添加注册表保护： 保护iMonitor键不被删除、修改，包括键值
+		//
 		cxMSGUserAddProtectRule rule;
 		rule.ProtectType = emProtectTypeRegPath;
 		wcsncpy(rule.Path, L"*\\iMonitor>", MONITOR_MAX_BUFFER);
@@ -120,13 +140,16 @@ int main()
 	}
 
 	{
+		//
+		// 添加信任进程：可以操作被保护的进程、文件、注册表，但是进程本身不受保护
+		//
 		cxMSGUserAddProtectRule rule;
 		rule.ProtectType = emProtectTypeTrustProcess;
 		wcsncpy(rule.Path, L"*taskkill*", MONITOR_MAX_BUFFER);
 		manager.InControl(rule);
 	}
 
-	WaitForExit("SelfProtect");
+	WaitForExit("自保护开启中");
 
 	manager.InControl(cxMSGUserRemoveAllProtectRule());
 	manager.InControl(cxMSGUserDisableProtect());
@@ -135,7 +158,7 @@ int main()
 }
 ```
 
-Example 3: sysmon
+示例三：sysmon
 
 ```c++
 class MonitorCallback : public IMonitorCallback
@@ -177,58 +200,82 @@ int main()
 
 <img src="./doc/sysmon.gif" />
 
-Example 4: Internet Access Control (based on network redirection, support https, refer to http_access_control example for details)
+示例四：上网行为管理（基于网络重定向的方式实现，支持https，详细参考http_access_control例子）
 
 ![](./doc/ac.png)
 
-More examples can refer to the sample directory.
+更多的示例可以参考sample目录。
 
-[For detailed instructions, please refer to the SDK documentation. ](./doc/README.md)
+[详细说明请参考SDK说明文档。](./doc/README.md)
 
-## License 
+## 使用授权
 
-> Disclaimer:
+> 免责说明：
 >
-> iMonitorSDK (hereinafter referred to as the SDK) is only licensed to be used by regular enterprise manufacturers. It is forbidden to be used in any illegal scenes such as endangering the safety of enterprises and individuals.
+> iMonitorSDK（以下称本SDK）只授权给为正规的企业厂商使用。禁止用于危害企业、个人安全等任何非法的场景。
 >
-> This SDK comes with a kernel driver. Although it has undergone stable testing and long-term operation verification, compatibility problems will inevitably exist due to hardware and environmental reasons. Before using this SDK, please log in to the corresponding business environment system After fully testing, actually connect to use.
+> 本SDK带有内核驱动程序，在使用本SDK前，请先在业务对应的环境系统中充分测试后再实际接入使用。
 >
-> The economic losses and legal issues caused by illegal authorization and illegal use have nothing to do with the SDK providing team.
+> 非法授权、非法使用而造成的经济损失、法律问题都于本SDK提供团队无关。
 >
-> Before you use this SDK, it is deemed that you have known and complied with this disclaimer.
+> 在您使用本SDK前，视为您已经知悉并且遵守此免责说明。
 
-Functional differences of different licenses:
+不同授权的功能差异：
 
-| Function description | Free License | Enterprise License | Enterprise Custom License |
-| -------------------- | ------------ | ------------------ | ------------------------- |
-| Process Monitoring | ✔ | ✔ | ✔ |
-| File Monitoring | ✔ | ✔ | ✔ |
-| Registry Monitoring | ✔ | ✔ | ✔ |
-| Network Monitoring | ✔ | ✔ | ✔ |
-| Self-protection | ✔ | ✔ | ✔ |
-| Network Protocol Proxy | ✔ | ✔ | ✔ |
-| Kernel object customization | | ✔ | ✔ |
-| Configuration | | ✔ | ✔ |
-| Rule Engine | | ✔ | ✔ |
-| Javascript script support | | | ✔ |
-| Linux support | | | ✔ |
-| MacOS support | | | ✔ |
-| Source code | | | ✔ |
-| Service Support | Mail, GitHub | Mail, GitHub, WeChat, Remote Desktop | ✔ |
+| 功能说明           | 免费授权     | 企业授权                     | 企业定制授权 |
+| ------------------ | ------------ | ---------------------------- | ------------ |
+| 进程监控           | ✔            | ✔                            | ✔            |
+| 文件监控           | ✔            | ✔                            | ✔            |
+| 注册表监控         | ✔            | ✔                            | ✔            |
+| 网络监控           | ✔            | ✔                            | ✔            |
+| 自保护             | ✔            | ✔                            | ✔            |
+| 网络协议代理       | ✔            | ✔                            | ✔            |
+| 内核对象定制       |              | ✔                            | ✔            |
+| 配置签发           |              | ✔                            | ✔            |
+| 规则引擎           |              | ✔                            | ✔            |
+| Javascript脚本支持 |              |                              | ✔            |
+| Linux支持          |              |                              | ✔            |
+| MacOS支持          |              |                              | ✔            |
+| 源码               |              |                              | ✔            |
+| 服务支持           | 邮件、GitHub | 邮件、GitHub、微信、远程桌面 | ✔            |
 
-[ contact via email (iMonitor@qq.com) for a licence ](mailto://iMonitor@qq.com)
+[授权请通过邮箱（iMonitor@qq.com）联系。](mailto://iMonitor@qq.com)
 
-## Products using this SDK
+## 使用本SDK的产品
 
-- [iMonitor - Endpoint Behavior Analysis System](https://github.com/wecooperate/iMonitor)
-- [iDefender - Endpoint Active Defense System](https://github.com/wecooperate/iDefender)
+- [iMonitor 冰镜 - 终端行为分析系统](https://github.com/wecooperate/iMonitor)
+- [iDefender 冰盾 - 终端主动防御系统](https://github.com/wecooperate/iDefender)
 
-## About Us
+## 版本更新说明
 
-Excellent people do professional things.
+#### 1.0.3.0
 
-Wecooperate Technology is an enterprise dedicated to providing basic services and an integrated management platform for enterprise management, striving to become the entrance to enterprise management and promoting the standardization and digitization of enterprise management. Our goal is to reject involution and let everyone work and live better.
+驱动：
 
-Our members are top talents from companies such as Kingsoft, 360, Tencent, etc., with deep technical skills. A number of core products are under development and require various talents and capital investment.
+添加对打开进程、文件等频繁操作添加快速过滤支持
+添加应用处理事件超时导致系统卡住的熔断机制
+添加回话超时配置，不同的应用程序可以设置不同的超时
 
-[Contact Us](mailto://iMonitor@qq.com)
+应用层：
+
+优化规则过滤：添加匹配缓存、添加扩展子节点
+
+#### 1.0.2.0
+
+添加代理支持
+
+添加上网行为管理功能演示
+
+#### 1.0.1.0 
+
+初始化版本
+
+## 关于我们
+
+优秀的人，做专业的事。
+
+创信长荣科技是一家致力于为企业管理提供基础服务、一体化管理平台，力争成为企业管理入口，促进企业管理标准化、数字化的企业。
+
+
+
+如有业务代理、商业合作、功能定制等需求，欢迎 [联系我们](mailto://iMonitor@qq.com)

@@ -114,13 +114,21 @@ public:
 	{
 		HRESULT hr = LoadMonitor(Path);
 
-		if (hr != S_OK || hr != S_FALSE)
+		if (hr != S_OK && hr != S_FALSE)
 			return hr;
 
 		if (!m_Monitor)
 			return E_UNEXPECTED;
 
 		return m_Monitor->Start(Callback);
+	}
+
+	HRESULT Stop(void)
+	{
+		if (!m_Monitor)
+			return E_UNEXPECTED;
+
+		return m_Monitor->Stop();
 	}
 
 public:

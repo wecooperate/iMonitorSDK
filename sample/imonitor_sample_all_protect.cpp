@@ -22,6 +22,8 @@ int main()
 
 	HRESULT hr = manager.Start(&callback);
 
+	CheckSignError(hr);
+
 	if (hr != S_OK) {
 		printf("start failed = %08X\n", hr);
 		return 0;
@@ -75,7 +77,10 @@ int main()
 		manager.InControl(rule);
 	}
 
-	WaitForExit("自保护开启中");
+	WaitForExit("自保护开启中：带taskkill的进程为白名单\r\n"
+				"\t保护notepad.exe进程不被结束（不包括界面上的关闭，比如任务管理器的结束任务)\r\n"
+				"\t保护protect的目录下面文件不被修改\r\n"
+				"\t保护iMonitor的注册表键下的内容不被修改");
 
 	manager.InControl(cxMSGUserRemoveAllProtectRule());
 	manager.InControl(cxMSGUserDisableProtect());

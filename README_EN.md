@@ -2,7 +2,7 @@
 
 iMonitorSDK is a development kit that provides system behavior monitoring for endpoint and the cloud. Help industry applications such as security, management, and auditing can quickly implement necessary functions without worrying about underlying driver development, maintenance, and compatibility issues, allowing them to focus on business development.
 
-iMonitorSDK also supports monitoring of processes, files, registry, network, system, etc., using standard and stable implementation methods, and also supports Windows (XP-Win11), Linux, and MacOS.
+iMonitorSDK development team comes from a leading domestic Internet company with more than ten years of security development experience. The communication framework based on the message protocol makes the driver development more stable and faster. Kernel monitoring is implemented in a stable and standard way, and supports Windows (XP-Win11), Linux, and MacOS at the same time.
 
 With iMonitorSDK, common terminal security functions such as self-protection, process interception, ransomware defense, active defense, and Internet behavior management can be realized at a very low cost.
 
@@ -219,7 +219,35 @@ Functional differences of different licenses:
 - [iMonitor - Endpoint Behavior Analysis System](https://github.com/wecooperate/iMonitor)
 - [iDefender - Endpoint Active Defense System](https://github.com/wecooperate/iDefender)
 
-## Version
+## Version(LTS:1.0.4.0)
+
+#### 1.0.4.0
+
+1. Application layer returns to drive parameters to add more setting support
+
+ Support the return path, automatically insert APC to inject DLL into the current process
+
+ Support setting to end the current process and thread
+
+2. Add private signature support for PE files
+
+ Add configuration control to only allow processes with private signatures to open the driver to ensure that the driver is not used
+
+ The private signature of the PE file can be set to self-protection mark, and it will automatically be self-protected when it is started.
+
+3. Add support for self-protection level (low-level self-protection processes cannot open high-level protection processes, and the PE file self-protection mark defaults to low level)
+
+4. Optimize the GUID generation rules of WFP, which can be compatible with installing multiple drivers at the same time
+
+5. Optimize the timeout settings for synchronous and asynchronous events. Different timeouts can be set for synchronous and asynchronous events
+
+6. (After feedback, it is necessary to fully support XP) The method of restoring SSDT Hook under XP is used to make up for the functions that the lower version of the standard Callback cannot achieve
+
+7. Add the following configuration to the driver configuration: enable_sign_protect, enable_sign_open_protect
+
+**Add LTS version support**:
+
+ At present, there are many customers using SDK. In order to ensure stability, version 1.0.4.X is used as the LTS version, which only fixes BUG and no longer adds any functions.
 
 #### 1.0.3.0
 

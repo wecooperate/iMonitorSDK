@@ -1,7 +1,6 @@
 //******************************************************************************
 /*++
 	Description:
-		文件打开拦截
 
 --*/
 //******************************************************************************
@@ -12,19 +11,16 @@ class MonitorCallback : public IMonitorCallback
 public:
 	void OnCallback(IMonitorMessage* Message) override
 	{
-		if (Message->GetType() != emMSGFileCreate)
+		if (Message->GetType() != emMSGImageLoad)
 			return;
 
-		cxMSGFileCreate* msg = (cxMSGFileCreate*)Message;
+		cxMSGImageLoad* msg = (cxMSGImageLoad*)Message;
 
-		//
-		// 保护带 .json 的文件不被修改、删除
-		//
+		if (!msg->IsMatchCurrentProcessName(L"notepad.exe"))
+			return;
 
-		if (FlagOn(msg->Access(), DELETE | FILE_WRITE_DATA)) {
-			if (msg->IsMatchPath(L"*.json")) {
-				msg->SetBlock();
-			}
+		if (msg->IsMatchPath(L"*\\kernel32.dll")) {
+			msg->SetInjectDll(L"D:\\test.dll");
 		}
 	}
 };
@@ -40,24 +36,16 @@ int main()
 
 	if (hr != S_OK) {
 		printf("start failed = %08X\n", hr);
-		return 0;
+		return 1;
 	}
 
 	manager.InControl(cxMSGUserSetGlobalConfig());
 
-	//
-	// emMSGConfigSend 同步事件，可以SetBlock禁止相应的动作
-	//
-
 	cxMSGUserSetMSGConfig config;
-	config.Config[emMSGFileCreate] = emMSGConfigSend;
+	config.Config[emMSGImageLoad] = emMSGConfigSend;
 	manager.InControl(config);
 
-	cxMSGUserSetSessionConfig sconfig;
-	sconfig.FilterFileCreateOnlyModifiable = TRUE;
-	manager.InControl(sconfig);
-
-	WaitForExit("保护带 .json 的文件不被修改、删除");
+	WaitForExit("模块注入：在notepad.exe启动加载kernel32.dll过程中，让其强制加载D:\\test.dll");
 
 	return 0;
 }

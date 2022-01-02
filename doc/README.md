@@ -1,3 +1,10 @@
+> 驱动加载需要签名，测试前请先对驱动进行签名。
+>
+> 如果没有正式的签名证书，可以使用测试签名，详细参考：
+>
+> 1. 开启测试模式： https://docs.microsoft.com/zh-cn/windows-hardware/drivers/install/the-testsigning-boot-configuration-option
+> 2. 对启动进行签名： https://docs.microsoft.com/zh-cn/windows-hardware/drivers/install/test-signing-a-driver-file
+
 ## 头文件说明
 
 -   iMonitor.h 驱动、应用层共用的定义
@@ -102,19 +109,25 @@ interface IMonitorMessage
     virtual bool            SetBlock            (void) = 0;
     virtual bool            SetGrantedAccess    (ULONG Access) = 0;
     virtual bool            SetIPRedirect       (ULONG IP, USHORT Port, ULONG ProcessId = ::GetCurrentProcessId()) = 0;
+   	virtual bool			SetTerminateProcess	(void) = 0;
+	virtual bool			SetTerminateThread	(void) = 0;
+    virtual bool            SetInjectDll        (LPCWSTR Path) = 0;
     virtual bool            SetFileRedirect     (LPCWSTR Path) = 0;
 };
 ```
 
-| 函数              | 说明                                                         |
-| ----------------- | ------------------------------------------------------------ |
-| GetString         | 要求字段必须是字符串，如果对应的字段不是字符串，则返回空字符串 |
-| GetFormatedString | 如果对应的字段是字符串，同GetString，否则将强制转换成字符串  |
-| IsWaiting         | 驱动是否阻塞事件执行，如果是可以通过SetXxx来响应事件（阻止、重定向等） |
-| SetBlock          | 阻止当前的操作                                               |
-| SetGrantedAccess  | 对于打开进程、打开线程操作，可以设置允许的打开权限           |
-| SetIPRedirect     | 对于Tcp连接，可以设置IP、Port重定向到新的地址                |
-| IsMatch           | 内置通配符字符串匹配，支持 * ？ >  （> 表示目录，dir>  等同于 dir + dir\\\\*） |
+| 函数                | 说明                                                         |
+| ------------------- | ------------------------------------------------------------ |
+| GetString           | 要求字段必须是字符串，如果对应的字段不是字符串，则返回空字符串 |
+| GetFormatedString   | 如果对应的字段是字符串，同GetString，否则将强制转换成字符串  |
+| IsWaiting           | 驱动是否阻塞事件执行，如果是可以通过SetXxx来响应事件（阻止、重定向等） |
+| SetBlock            | 阻止当前的操作                                               |
+| SetGrantedAccess    | 对于打开进程、打开线程操作，可以设置允许的打开权限           |
+| SetTerminateProcess | 结束当前进程                                                 |
+| SetTerminateThread  | 结束当前线程                                                 |
+| SetInjectDll        | 对当前进程注入动态库（自己判断是32位的还是64位进程）         |
+| SetIPRedirect       | 对于Tcp连接，可以设置IP、Port重定向到新的地址                |
+| IsMatch             | 内置通配符字符串匹配，支持 * ？ >  （> 表示目录，dir>  等同于 dir + dir\\\\*） |
 
 ## 驱动配置
 
@@ -135,6 +148,8 @@ iMonitorSDK必须带签名过的配置文件（iMonitor.scer）才能正常加�
 | enable_wfp_monitor       | bool   | 是否允许开启wfp监控                                          |
 | enable_self_protect      | bool   | 是否开启子保护（开启了驱动所在目录的进程、文件都会被保护）   |
 | enable_self_open_protect | bool   | 是否开启驱动打开自保护（开启了只允许驱动所在目录打开驱动通讯端口） |
+| enable_sign_protect      | bool   | 是否根据PE的私有签名开启自保护                               |
+| enable_sign_open_protect | bool   | 是否只允许带私有签名的进程打开驱动                           |
 | trust_open_path_list     | array  | 字符串数组，允许打开驱动通讯端口的进程路径列表               |
 | protect_list             | array  | 对象数组，其他被保护的路径列表（包括进程、文件、注册表）     |
 | black_process_name_list  | array  | 禁止启动进程名黑名单                                         |
@@ -486,6 +501,30 @@ interface IMonitorAgentChannel
 | SSLIsFallback        | 如果设置了ssl，但是解析后发现不是ssl的，会回退到原始数据包的状态，这里判断是否回退过。 |
 
 ## 版本说明
+
+### 1.0.4.0
+
+1. 应用层返回驱动的参数添加更多设置支持
+
+​		支持返回路径，自动插入APC注入DLL到当前进程
+
+​		支持设置结束当前进程、线程
+
+2. 添加PE文件的私有签名支持
+
+​		添加配置控制只允许带私有签名的进程打开驱动，保证驱动不被利用
+
+​		PE文件私有签名可以设置自保护标记，启动的时候自动得到自保护
+
+3. 添加自保护等级支持（低等级自保护的进程没法打开高保护等级的进程，PE文件自保护标记默认为低等级）
+
+4. 优化WFP的GUID生成规则，可以兼容同时安装多份驱动
+
+5. 优化同步、异步事件的超时设置，同步、异步可以设置不同的超时
+
+6. （经反馈还有需要完整支持XP）XP下恢复SSDT Hook的方式，用于弥补低版本标准Callback没法实现的功能
+
+7. 驱动配置添加下列配置：enable_sign_protect，enable_sign_open_protect
 
 ### 1.0.3.0
 

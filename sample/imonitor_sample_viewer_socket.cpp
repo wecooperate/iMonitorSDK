@@ -1,25 +1,24 @@
 //******************************************************************************
 /*++
 	Description:
-		打印监控到的所有事件信息，输出如下：
-
-ProcessOpen ==> C:\Windows\System32\conhost.exe
-             CurrentProcessCommandline : \??\C:\Windows\system32\conhost.exe
-                                  Path : F:\Git\iMonitor\bin\Debug\imonitor_sample_all_sysmon.exe
-                             ProcessId : 31912
-                       ParentProcessId : 23424
-                         DesiredAccess : 4096
-                             Duplicate : false
 
 --*/
 //******************************************************************************
 #include "imonitor_sample.h"
+#include <set>
 //******************************************************************************
 class MonitorCallback : public IMonitorCallback
 {
+	std::set<ULONG> m_MSGs;
+
 public:
 	void OnCallback(IMonitorMessage* msg) override
 	{
+		if (m_MSGs.find(msg->GetType()) != m_MSGs.end())
+			return;
+
+		m_MSGs.insert(msg->GetType());
+
 		printf("%S ==> %S\n", msg->GetTypeName(), msg->GetFormatedString(emMSGFieldCurrentProcessPath));
 
 		for (ULONG i = emMSGFieldCurrentProcessCommandline; i < msg->GetFieldCount(); i++) {
@@ -43,12 +42,12 @@ int main()
 	}
 
 	cxMSGUserSetMSGConfig config;
-	for (int i = 0; i < emMSGMax; i++) {
+	for (int i = emMSGSocket; i < emMSGSocket + 100; i++) {
 		config.Config[i] = emMSGConfigPost;
 	}
 	manager.InControl(config);
 
-	WaitForExit("");
+	WaitForExit("方便查看、验证消息的监控和各字段是否正常");
 
 	return 0;
 }

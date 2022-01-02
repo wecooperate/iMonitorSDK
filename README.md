@@ -6,18 +6,16 @@ iMonitorSDK是一款为终端、云端提供系统行为监控的开发套件。
 
 旨在帮助安全、管理、审计等行业应用可以快速实现必要功能，而不用关心底层驱动的开发、维护和兼容性问题，让其可以专注于业务开发。
 
-iMonitorSDK同时支持进程、文件、注册表、网络、系统等的监控，使用标准稳定的实现方式，同时支持Windows（XP-Win11）、Linux、MacOS。
+iMonitorSDK的开发团队来自国内头部互联网公司，具备十多年安全开发经验，基于消息协议的通信框架，让驱动开发更加稳定、快速。内核监控使用了稳定、标准的方式实现，同时支持Windows（XP-Win11）、Linux、MacOS。
 
-利用iMonitorSDK可以极低成本的实现自保护、进程拦截、勒索病毒防御、主动防御、上网行为管理等等终端安全常见的功能。
+利用iMonitorSDK可以极低成本地实现自保护、进程拦截、勒索病毒防御、主动防御、上网行为管理等等终端安全常见的功能。
 
 ### ✨ 具备如下核心功能
 
+- 进程、文件、注册表、网络各种事件监听，支持拦截禁止
 - 进程、文件、注册表保护
-
 - 进程启动、模块加载拦截，模块注入
-
 - 文件拦截、重定向
-
 - 网络防火墙、流量代理、协议分析
 - 规则引擎、动态脚本
 
@@ -204,9 +202,57 @@ int main()
 
 ![](./doc/ac.png)
 
+示例五：任意时刻对进程注入动态库
+
+```c++
+class MonitorCallback : public IMonitorCallback
+{
+public:
+	void OnCallback(IMonitorMessage* Message) override
+	{
+		if (Message->GetType() != emMSGImageLoad)
+			return;
+
+		cxMSGImageLoad* msg = (cxMSGImageLoad*)Message;
+
+		if (!msg->IsMatchCurrentProcessName(L"notepad.exe"))
+			return;
+
+		if (msg->IsMatchPath(L"*\\kernel32.dll")) {
+			msg->SetInjectDll(L"D:\\test.dll");
+		}
+	}
+};
+
+int main()
+{
+	MonitorManager manager;
+	MonitorCallback callback;
+
+	HRESULT hr = manager.Start(&callback);
+
+	CheckSignError(hr);
+
+	if (hr != S_OK) {
+		printf("start failed = %08X\n", hr);
+		return 1;
+	}
+
+	manager.InControl(cxMSGUserSetGlobalConfig());
+
+	cxMSGUserSetMSGConfig config;
+	config.Config[emMSGImageLoad] = emMSGConfigSend;
+	manager.InControl(config);
+
+	WaitForExit("模块注入：在notepad.exe启动加载kernel32.dll过程中，让其强制加载D:\\test.dll");
+
+	return 0;
+}
+```
+
 更多的示例可以参考sample目录。
 
-[详细说明请参考SDK说明文档。](./doc/README.md)
+[详细使用说明请参考SDK说明文档。](./doc/README.md)
 
 ## 使用授权
 
@@ -246,7 +292,35 @@ int main()
 - [iMonitor 冰镜 - 终端行为分析系统](https://github.com/wecooperate/iMonitor)
 - [iDefender 冰盾 - 终端主动防御系统](https://github.com/wecooperate/iDefender)
 
-## 版本更新说明
+## 版本更新说明（LTS版本：1.0.4.0）
+
+#### 1.0.4.0
+
+1. 应用层返回驱动的参数添加更多设置支持
+
+​		支持返回路径，自动插入APC注入DLL到当前进程
+
+​		支持设置结束当前进程、线程
+
+2. 添加PE文件的私有签名支持
+
+​		添加配置控制只允许带私有签名的进程打开驱动，保证驱动不被利用
+
+​		PE文件私有签名可以设置自保护标记，启动的时候自动得到自保护
+
+3. 添加自保护等级支持（低等级自保护的进程没法打开高保护等级的进程，PE文件自保护标记默认为低等级）
+
+4. 优化WFP的GUID生成规则，可以兼容同时安装多份驱动
+
+5. 优化同步、异步事件的超时设置，同步、异步可以设置不同的超时
+
+6. （经反馈还有需要完整支持XP）XP下恢复SSDT Hook的方式，用于弥补低版本标准Callback没法实现的功能
+
+7. 驱动配置添加下列配置：enable_sign_protect，enable_sign_open_protect
+
+**添加LTS版本支持**：
+
+​	目前使用SDK的客户多了，为了保证稳定性，1.0.4.X版本作为LTS版本，只修复BUG，不再添加任何功能。
 
 #### 1.0.3.0
 
@@ -278,4 +352,4 @@ int main()
 
 
 
-如有业务代理、商业合作、功能定制等需求，欢迎 [联系我们](mailto://iMonitor@qq.com)
+**目前创业启动资金筹备中，承接终端安全相关的各类需求，有任何商业合作、功能定制的欢迎 [联系我们](mailto://iMonitor@qq.com)**

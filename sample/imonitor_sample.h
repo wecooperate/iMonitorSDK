@@ -21,6 +21,7 @@ inline void CheckSignError(HRESULT hr)
 		printf("1. 开启测试模式： https://docs.microsoft.com/zh-cn/windows-hardware/drivers/install/the-testsigning-boot-configuration-option\n");
 		printf("2. 对启动进行签名： https://docs.microsoft.com/zh-cn/windows-hardware/drivers/install/test-signing-a-driver-file\n");
 		printf("================================\n");
+		system("PAUSE");
 	}
 }
 //******************************************************************************

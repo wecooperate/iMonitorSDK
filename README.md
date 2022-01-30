@@ -285,7 +285,7 @@ int main()
 | 源码               |              |                              | ✔            |
 | 服务支持           | 邮件、GitHub | 邮件、GitHub、微信、远程桌面 | ✔            |
 
-[授权请通过邮箱（iMonitor@qq.com）联系。](mailto://iMonitor@qq.com)
+[授权请通过邮箱（admin@iMonitorSDK.com）联系。](mailto://admin@iMonitorSDK.com)
 
 ## 使用本SDK的产品
 

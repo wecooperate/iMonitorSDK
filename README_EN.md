@@ -214,7 +214,7 @@ Functional differences of different licenses:
 | Source code | | | ✔ |
 | Service Support | Mail, GitHub | Mail, GitHub, WeChat, Remote Desktop | ✔ |
 
-[ contact via email (iMonitor@qq.com) for a licence ](mailto://iMonitor@qq.com)
+[ contact via email (admin@iMonitorSDK.com) for a licence ](mailto://admin@iMonitorSDK.com)
 
 ## Products using this SDK
 

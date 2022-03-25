@@ -208,9 +208,9 @@ Functional differences of different licenses:
 | Kernel object customization | | ✔ | ✔ |
 | Configuration | | ✔ | ✔ |
 | Rule Engine | | ✔ | ✔ |
-| Javascript script support | | | ✔ |
-| Linux support | | | ✔ |
-| MacOS support | | | ✔ |
+| Javascript script support | | |  |
+| Linux support | | |  |
+| MacOS support | | |  |
 | Source code | | | ✔ |
 | Service Support | Mail, GitHub | Mail, GitHub, WeChat, Remote Desktop | ✔ |
 

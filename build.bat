@@ -18,8 +18,8 @@ If "%a%"=="5" Goto BuildRelease64
 Exit
 
 :GenerateSolution
-cmake -G "Visual Studio 16 2019" -A "x64" -T "v141_xp" sample/CMakeLists.txt -B build/64
-cmake -G "Visual Studio 16 2019" -A "Win32" -T "v141_xp" sample/CMakeLists.txt -B build/32
+cmake -G "Visual Studio 17 2022" -A "x64" -T "v141_xp" sample/CMakeLists.txt -B build/64
+cmake -G "Visual Studio 17 2022" -A "Win32" -T "v141_xp" sample/CMakeLists.txt -B build/32
 Goto Menu
 
 :BuildDebug32

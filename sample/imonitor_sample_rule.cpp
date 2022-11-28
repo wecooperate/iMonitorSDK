@@ -8,7 +8,7 @@
 //******************************************************************************
 class MonitorCallback
 	: public IMonitorCallback
-	, public IMonitorRuleCallback
+	, public IMonitorMatchCallback
 {
 public:
 	void OnCallback(IMonitorMessage* Message) override
@@ -16,9 +16,9 @@ public:
 		m_RuleEngine->Match(Message, this);
 	}
 
-	emMatchStatus OnMatch(IMonitorMessage* Message, const MatchResult& Result) override
+	emMatchStatus OnMatch(IMonitorMessage* Message, IMonitorRule* Rule) override
 	{
-		if (Result.Action & emMSGActionBlock) {
+		if (Rule->GetAction() & emMSGActionBlock) {
 			Message->SetBlock();
 			printf("match block rule %s.%s\n", Result.GroupName, Result.RuleName);
 			return emMatchStatusBreak;

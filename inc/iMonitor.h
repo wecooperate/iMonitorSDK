@@ -11,7 +11,12 @@
 // clang-format off
 //******************************************************************************
 #define MONITOR_VERSION                       2000
+#ifdef MONITOR_BUILD_FOR_SDK
 #define MONITOR_LICENSE_VERSION               1
+#else
+#define MONITOR_LICENSE_VERSION               1001
+#define MONITOR_LICENSE_PRIVATE               0xCCCCCCCC12345678ul
+#endif
 #define MONITOR_MAX_BUFFER                    260
 //******************************************************************************
 #ifndef BIT
@@ -318,6 +323,10 @@ struct cxMSGAction
 //******************************************************************************
 struct cxMSGUserHeader 
 {
+#ifndef MONITOR_BUILD_FOR_SDK
+    ULONGLONG            PrivateHead                   = MONITOR_LICENSE_PRIVATE;
+#endif
+
     ULONG                Type;
     ULONG                LicenseVersion                = MONITOR_LICENSE_VERSION;
 };

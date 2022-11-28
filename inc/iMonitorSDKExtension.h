@@ -12,29 +12,48 @@
 //******************************************************************************
 interface IMonitorMessage;
 //******************************************************************************
-interface IMonitorRuleCallback
+interface IMonitorRule
+{
+	virtual	const char*		GetId				(void) = 0;
+	virtual const char*		GetName				(void) = 0;
+	virtual const char*		GetDescription		(void) = 0;
+	virtual const char*		GetGroupName		(void) = 0;
+	virtual ULONG			GetAction			(void) = 0;
+	virtual const char*		GetActionParam		(void) = 0;
+	virtual	ULONG			GetMessageTypeCount	(void) = 0;
+	virtual ULONG			GetMessageType		(ULONG Index) = 0;
+};
+//******************************************************************************
+interface IMonitorMessageField
+{
+	using RuleString = CStringW;
+	using RuleNumber = ULONGLONG;
+
+	virtual	bool			GetString			(IMonitorMessage* Object, RuleString& Value) = 0;
+	virtual bool			GetNumber			(IMonitorMessage* Object, RuleNumber& Value) = 0;
+};
+//******************************************************************************
+interface IMonitorRuleContext
+{
+	virtual IMonitorMessageField* GetCustomField(const char* Field) = 0;
+};
+//******************************************************************************
+interface IMonitorMatchCallback
 {
 	enum emMatchStatus {
 		emMatchStatusBreak,
 		emMatchStatusContinue,
 	};
 
-	struct MatchResult {
-		ULONG				Action;
-		const char*			ActionParam;
-		const char*			GroupName;
-		const char*			RuleName;
-	};
-
 	virtual void			OnBeginMatch		(IMonitorMessage* Message) {}
 	virtual void			OnFinishMatch		(IMonitorMessage* Message) {}
-	virtual emMatchStatus	OnMatch				(IMonitorMessage* Message, const MatchResult& Result) = 0;
+	virtual emMatchStatus	OnMatch				(IMonitorMessage* Message, IMonitorRule* Rule) = 0;
 };
 //******************************************************************************
 interface __declspec(uuid("51237525-2811-4BE2-A6A3-D8889E0D0CA1")) IMonitorRuleEngine : public IUnknown
 {
-	virtual void			Match				(IMonitorMessage* Message, IMonitorRuleCallback* Callback) = 0;
-	virtual void			EnumAffectedMessage	(void(*Callback)(ULONG Type, void* Context), void* Context) = 0;
+	virtual void			Match				(IMonitorMessage* Message, IMonitorMatchCallback* Callback) = 0;
+	virtual void			EnumRule			(void(*Callback)(IMonitorRule* Rule, void* Context), void* Context) = 0;
 };
 //******************************************************************************
 interface IMonitorAgentChannel

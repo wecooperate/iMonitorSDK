@@ -6,7 +6,7 @@
             "name" : "block notepad start",
             "action" : 1,
             "action_param" : "",
-            "event" : ["ProcessCreate"],
+            "event" : "ProcessCreate",
             "matcher" : {
                 "or" : [
                     {"match" : ["Path", "*\\notepad.exe"]},

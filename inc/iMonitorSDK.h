@@ -66,16 +66,28 @@ interface IMonitorMessage
 	virtual bool			SetTerminateThread	(void) = 0;
 	virtual bool			SetInjectDll		(LPCWSTR Path) = 0;
 	virtual bool			SetFileRedirect		(LPCWSTR Path) = 0;
+	virtual void			SetCustomContext	(PVOID Context) = 0;
+	virtual PVOID			GetCustomContext	(void) = 0;
+
+	//
+	//	设置Pending成功后，可以拥有IMonitorMessage的生命周期，允许在回调返回后继续使用。
+	//	使用完毕，一定需要使用CompletePending来恢复状态，不然内核等待事件需要超时才能返回。
+	//
+	//	使用场景：需要弹框交互确认、或者是多线程处理的场景。
+	//
+	virtual bool			Pending				(void) = 0;
+	virtual void			CompletePending		(void) = 0;
 };
 //******************************************************************************
 interface IMonitorCallbackInternal
 {
-	virtual void			OnCallback			(cxMSGHeader* Header, cxMSGAction* Action) = 0;
+	virtual bool			OnCallback			(cxMSGHeader* Header, HANDLE FilterHandle, ULONGLONG MessageId) = 0;
 };
 //******************************************************************************
 interface IMonitorCallback
 {
 	virtual void			OnCallback			(IMonitorMessage* Message) = 0;
+	virtual void			OnCustomEvent		(ULONG Type, PVOID Context) {};
 };
 //******************************************************************************
 interface __declspec (uuid(IMONITOR_IID)) IMonitorManager : public IUnknown
@@ -85,8 +97,9 @@ interface __declspec (uuid(IMONITOR_IID)) IMonitorManager : public IUnknown
 	virtual HRESULT			Control				(PVOID Data, ULONG Length, PVOID OutData = NULL, ULONG OutLength = 0, PULONG ReturnLength = NULL) = 0;
 	virtual HRESULT			Stop				(void) = 0;
 	virtual HRESULT			UnloadDriver		(void) = 0;
+	virtual HRESULT			SendCustomEvent		(ULONG Type, PVOID Context) = 0;
 
-	virtual	HRESULT			CreateRuleEngine	(LPCWSTR Path, IMonitorRuleEngine** Engine) = 0;
+	virtual	HRESULT			CreateRuleEngine	(LPCWSTR Path, IMonitorRuleEngine** Engine, IMonitorRuleContext* Context = nullptr) = 0;
 	virtual HRESULT			CreateAgentEngine	(ULONG MaxThread, IMonitorAgentEngine** Engine) = 0;
 };
 //******************************************************************************
@@ -145,12 +158,25 @@ public:
 		return m_Monitor->Stop();
 	}
 
-	HRESULT UnloadDriver(void)
+	HRESULT UnloadDriver(LPCTSTR Path = MONITOR_MODULE_NAME)
 	{
+		HRESULT hr = LoadMonitor(Path);
+
+		if (hr != S_OK && hr != S_FALSE)
+			return hr;
+
 		if (!m_Monitor)
 			return E_UNEXPECTED;
 
 		return m_Monitor->UnloadDriver();
+	}
+
+	HRESULT SendCustomEvent(ULONG Type, PVOID Context)
+	{
+		if (!m_Monitor)
+			return E_UNEXPECTED;
+
+		return m_Monitor->SendCustomEvent(Type, Context);
 	}
 
 public:

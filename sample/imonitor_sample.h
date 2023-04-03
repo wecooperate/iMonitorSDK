@@ -20,6 +20,8 @@ inline void CheckSignError(HRESULT hr)
 		printf("If you don't have an official signing certificate, you can use test signing.\n");
 		printf("For test signing details, refer to the bin\\test_signed directory.\n");
 		printf("More information can be obtained through the https://iMonitorSDK.com/docs/sign \n");
+		printf("测试版本带的驱动没有签名，测试可以使用开启测试签名的方式来测试，或者自己使用证书签名。\n");
+		printf("详细可以参考：https://iMonitorSDK.com/docs/sign \n");
 		printf("================================\n");
 		system("PAUSE");
 	}

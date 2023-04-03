@@ -30,6 +30,24 @@
 //	interface
 //
 //******************************************************************************
+interface IMonitorMessageProcess
+{
+	virtual ULONG			GetProcessId		(void) = 0;
+	virtual ULONG			GetParentProcessId	(void) = 0;
+	virtual LPCWSTR			GetProcessName		(void) = 0;
+	virtual LPCWSTR			GetProcessPath		(void) = 0;
+	virtual LPCWSTR			GetCommandline		(void) = 0;
+	virtual LPCWSTR			GetCompanyName		(void) = 0;
+	virtual LPCWSTR			GetProductName		(void) = 0;
+	virtual LPCWSTR			GetFileDescription	(void) = 0;
+	virtual LPCWSTR			GetSigner			(void) = 0;
+	virtual bool			IsSignerVerified	(void) = 0;
+	virtual LPCWSTR			GetCatalogSigner	(void) = 0;
+	virtual bool			IsCatalogSignerVerified(void) = 0;
+	virtual PUCHAR			GetMD5				(void) = 0;
+	virtual LPCWSTR			GetMD5String		(void) = 0;
+};
+//******************************************************************************
 interface IMonitorMessage
 {
 	struct Binary {
@@ -51,6 +69,7 @@ interface IMonitorMessage
 
 	virtual ULONG			GetULONG			(ULONG Index) = 0;
 	virtual ULONGLONG		GetULONGLONG		(ULONG Index) = 0;
+	virtual cxMSGDataIPRef	GetIP				(ULONG Index) = 0;
 	virtual LPCWSTR			GetString			(ULONG Index) = 0;
 	virtual LPCWSTR			GetFormatedString	(ULONG Index) = 0;
 	virtual Binary			GetBinary			(ULONG Index) = 0;
@@ -77,11 +96,14 @@ interface IMonitorMessage
 	//
 	virtual bool			Pending				(void) = 0;
 	virtual void			CompletePending		(void) = 0;
+
+	virtual IMonitorMessageProcess* GetProcess	(void) = 0;
 };
 //******************************************************************************
 interface IMonitorCallbackInternal
 {
 	virtual bool			OnCallback			(cxMSGHeader* Header, HANDLE FilterHandle, ULONGLONG MessageId) = 0;
+	virtual void			OnCustomEvent		(ULONG Type, PVOID Context) {};
 };
 //******************************************************************************
 interface IMonitorCallback
@@ -90,17 +112,30 @@ interface IMonitorCallback
 	virtual void			OnCustomEvent		(ULONG Type, PVOID Context) {};
 };
 //******************************************************************************
+interface __declspec (uuid("{87AFD09D-59D7-47AD-8A32-5852F2FB958D}")) IMonitorProcess : public IUnknown, public IMonitorMessageProcess
+{
+};
+//******************************************************************************
 interface __declspec (uuid(IMONITOR_IID)) IMonitorManager : public IUnknown
 {
 	virtual HRESULT			Start				(IMonitorCallbackInternal* Callback) = 0;
 	virtual HRESULT			Start				(IMonitorCallback* Callback) = 0;
-	virtual HRESULT			Control				(PVOID Data, ULONG Length, PVOID OutData = NULL, ULONG OutLength = 0, PULONG ReturnLength = NULL) = 0;
+	virtual HRESULT			Control				(PVOID Data, ULONG Length, PVOID OutData = nullptr, ULONG OutLength = 0, PULONG ReturnLength = nullptr) = 0;
 	virtual HRESULT			Stop				(void) = 0;
 	virtual HRESULT			UnloadDriver		(void) = 0;
 	virtual HRESULT			SendCustomEvent		(ULONG Type, PVOID Context) = 0;
 
 	virtual	HRESULT			CreateRuleEngine	(LPCWSTR Path, IMonitorRuleEngine** Engine, IMonitorRuleContext* Context = nullptr) = 0;
 	virtual HRESULT			CreateAgentEngine	(ULONG MaxThread, IMonitorAgentEngine** Engine) = 0;
+
+	virtual HRESULT			FindProcess			(ULONG ProcessId, IMonitorProcess** Process) = 0;
+
+	//
+	// 是否开启域名解析，开启后可以通过IP反查对应的域名，默认开启，如果需要关闭可以通过EnableDomainParser(false）关闭
+	//
+	virtual void			EnableDomainParser	(bool Enable) = 0;
+	virtual CString			GetDomainFromIP		(ULONG IP) = 0;
+	virtual CString			GetDomainFromIP		(const cxMSGDataIP& IP) = 0;
 };
 //******************************************************************************
 //
@@ -179,6 +214,30 @@ public:
 		return m_Monitor->SendCustomEvent(Type, Context);
 	}
 
+	HRESULT FindProcess(ULONG ProcessId, IMonitorProcess** Process)
+	{
+		if (!m_Monitor)
+			return E_UNEXPECTED;
+
+		return m_Monitor->FindProcess(ProcessId, Process);
+	}
+
+	CString GetDomainFromIP(ULONG IP)
+	{
+		if (!m_Monitor)
+			return CString();
+
+		return m_Monitor->GetDomainFromIP(IP);
+	}
+
+	CString GetDomainFromIP(cxMSGDataIPRef IP)
+	{
+		if (!m_Monitor)
+			return CString();
+
+		return m_Monitor->GetDomainFromIP(IP);
+	}
+
 public:
 	template<typename T>
 	HRESULT InControl(const T& config)
@@ -189,13 +248,21 @@ public:
 		return m_Monitor->Control((PVOID)&config, sizeof(config));
 	}
 
-	CComPtr<IMonitorRuleEngine> CreateRuleEngine(LPCWSTR Path)
+	HRESULT Control(PVOID Data, ULONG Length, PVOID OutData = nullptr, ULONG OutLength = 0, PULONG ReturnLength = nullptr)
+	{
+		if (!m_Monitor)
+			return E_UNEXPECTED;
+
+		return m_Monitor->Control(Data, Length, OutData, OutLength, ReturnLength);
+	}
+
+	CComPtr<IMonitorRuleEngine> CreateRuleEngine(LPCWSTR Path, IMonitorRuleContext* Context = nullptr)
 	{
 		if (!m_Monitor)
 			return NULL;
 
 		CComPtr<IMonitorRuleEngine> engine;
-		HRESULT hr = m_Monitor->CreateRuleEngine(Path, &engine);
+		HRESULT hr = m_Monitor->CreateRuleEngine(Path, &engine, Context);
 
 		if (hr != S_OK)
 			return NULL;

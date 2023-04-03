@@ -20,7 +20,7 @@ public:
 		// 重定向123.123.123.123的地址到127.0.0.1
 		//
 
-		if (msg->IP() == 0x7B7B7B7B) {
+		if (msg->IP().IPv4.IP == 0x7B7B7B7B) {
 			printf("redirect\n");
 			msg->SetIPRedirect(0x0100007F, msg->Port());
 		}

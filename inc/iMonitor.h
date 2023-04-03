@@ -10,7 +10,7 @@
 //******************************************************************************
 // clang-format off
 //******************************************************************************
-#define MONITOR_VERSION                       2000
+#define MONITOR_VERSION                       2300
 #define MONITOR_LICENSE_VERSION               1
 #define MONITOR_MAX_BUFFER                    260
 //******************************************************************************
@@ -147,6 +147,8 @@ enum emMSGTypeWFP
     emMSGWFPUdpConnect,
     emMSGWFPTcpAccept,
     emMSGWFPUdpAccept,
+	emMSGWFPICMPConnect,
+    emMSGWFPICMPAccept,
 };
 //******************************************************************************
 enum emMSGTypeHTTP
@@ -190,6 +192,7 @@ enum emMSGDataType
     emMSGDataPath                              = 0x40000,
     emMSGDataBinary                            = 0x50000,
     emMSGDataCallstack                         = 0x60000,
+    emMSGDataSocketIP                          = 0x70000,
 
 #define MSG_GET_BASE_TYPE(type)                (type & 0xFFFF0000)
 
@@ -209,7 +212,6 @@ enum emMSGDataType
     emMSGDataRegAccess,
     emMSGDataRegOptions,
     emMSGDataRegType,
-    emMSGDataSocketIP,
     emMSGDataSocketPort,
 
     emMSGDataTime = emMSGDataULONGLONG + 1,
@@ -298,6 +300,49 @@ struct cxMSGDataHeader
     cxMSGDataHeader* Next(void)               { return (cxMSGDataHeader*)((ULONG_PTR)this + Length); }
 };
 //******************************************************************************
+struct cxMSGDataIP
+{
+    enum {
+        emIPNone,
+        emIPv4,
+        emIPv6,
+    };
+
+    ULONG               Type;
+    union {
+	    UCHAR           IPv6[16];
+	    struct {
+		    UCHAR       Zero[10];
+		    USHORT      FFFF;
+		    ULONG       IP;
+	    }               IPv4;
+    };
+
+    cxMSGDataIP(void)
+    {
+        Type = emIPNone;
+        memset(IPv6, 0, sizeof(IPv6));
+    }
+
+    bool IsIPv4() const
+    {
+        if (Type != emIPv6)
+            return true;
+
+        UCHAR Zero[16] = {};
+
+        if (0 == memcmp(IPv6, Zero, 16))
+            return true;
+   
+        if (0 == memcmp(IPv4.Zero, Zero, 10) && IPv4.FFFF == 0xFFFF)
+            return true;
+
+        return false;
+    }
+};
+
+typedef const cxMSGDataIP& cxMSGDataIPRef;
+//******************************************************************************
 struct cxMSGAction
 {
     ULONG                Action;
@@ -367,6 +412,10 @@ enum
     emUserRemoveProtectRule,
     emUserRemoveAllProtectRule,
     emUserEnumProtectRule,
+
+    emAPIBegin = emMSGUserControl + 100,
+    emAPIOpenProcess,
+    emAPIEnd,
 };
 //******************************************************************************
 struct cxUserGlobalConfig
@@ -443,12 +492,24 @@ enum emUserProtectType
     emProtectTypeProcessPath = BIT(1),
     emProtectTypeFilePath = BIT(2),
     emProtectTypeRegPath = BIT(3),
+    emProtectTypeConnectedOnly = BIT(12),
 };
 //******************************************************************************
 struct cxUserProtectItem
 {
     ULONG        ProtectType;
     WCHAR        Path[MONITOR_MAX_BUFFER];
+};
+//******************************************************************************
+struct cxAPIOpenProcess
+{
+    ULONG       ProcessId;
+    ULONG       DesiredAccess;
+
+    struct Result
+    {
+        ULONG   ProcessHandle;
+    };
 };
 //******************************************************************************
 typedef cxMSGUser<emUserSetGlobalConfig, cxUserGlobalConfig> cxMSGUserSetGlobalConfig;
@@ -463,5 +524,7 @@ typedef cxMSGUser<emUserAddProtectRule, cxUserProtectItem> cxMSGUserAddProtectRu
 typedef cxMSGUser<emUserRemoveProtectRule, cxUserProtectItem> cxMSGUserRemoveProtectRule;
 typedef cxMSGUser<emUserRemoveAllProtectRule> cxMSGUserRemoveAllProtectRule;
 typedef cxMSGUser<emUserEnumProtectRule> cxMSGUserEnumProtectRule;
+//******************************************************************************
+typedef cxMSGUser<emAPIOpenProcess, cxAPIOpenProcess> cxMSGAPIOpenProcess;
 //******************************************************************************
 #endif

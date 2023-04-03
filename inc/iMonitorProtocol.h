@@ -35,7 +35,7 @@ protected:
 	ULONG GetRegAccess(ULONG Index) { return GetULONG(Index); }
 	ULONG GetRegOptions(ULONG Index) { return GetULONG(Index); }
 	ULONG GetRegType(ULONG Index) { return GetULONG(Index); }
-	ULONG GetSocketIP(ULONG Index) { return GetULONG(Index); }
+	cxMSGDataIP GetSocketIP(ULONG Index) { return GetIP(Index); }
 	USHORT GetSocketPort(ULONG Index) { return (SHORT)GetULONG(Index); }
 	ULONGLONG GetTime(ULONG Index) { return GetULONGLONG(Index); }
 };
@@ -1645,6 +1645,94 @@ public:
 	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
 
 };
+class cxMSGWFPICMPConnect : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+	};
+
+public:
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+
+};
+class cxMSGWFPTcpAccept : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+	};
+
+public:
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+
+};
+class cxMSGWFPUdpAccept : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+	};
+
+public:
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+
+};
+class cxMSGWFPICMPAccept : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+	};
+
+public:
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+
+};
 class cxMSGHTTPRequest : public MonitorMessage
 {
 public:
@@ -1657,8 +1745,10 @@ public:
 		emMSGFieldPath,
 		emMSGFieldIP,
 		emMSGFieldPort,
+		emMSGFieldMethod,
 		emMSGFieldHost,
 		emMSGFieldUri,
+		emMSGFieldUrl,
 		emMSGFieldHeader,
 		emMSGFieldData,
 		emMSGFieldStatus,
@@ -1670,8 +1760,10 @@ public:
 	auto Path() { return GetString(emMSGFieldPath); }
 	auto IP() { return GetSocketIP(emMSGFieldIP); }
 	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto Method() { return GetString(emMSGFieldMethod); }
 	auto Host() { return GetString(emMSGFieldHost); }
 	auto Uri() { return GetString(emMSGFieldUri); }
+	auto Url() { return GetString(emMSGFieldUrl); }
 	auto Header() { return GetString(emMSGFieldHeader); }
 	auto Data() { return GetBinary(emMSGFieldData); }
 	auto Status() { return GetULONG(emMSGFieldStatus); }
@@ -1679,8 +1771,10 @@ public:
 	auto ResponseData() { return GetBinary(emMSGFieldResponseData); }
 
 	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+	bool IsMatchMethod(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldMethod, Pattern, IgnoreCase); }
 	bool IsMatchHost(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldHost, Pattern, IgnoreCase); }
 	bool IsMatchUri(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldUri, Pattern, IgnoreCase); }
+	bool IsMatchUrl(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldUrl, Pattern, IgnoreCase); }
 	bool IsMatchHeader(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldHeader, Pattern, IgnoreCase); }
 	bool IsMatchResponseHeader(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldResponseHeader, Pattern, IgnoreCase); }
 };

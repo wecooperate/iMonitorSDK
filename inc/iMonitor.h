@@ -279,7 +279,9 @@ struct cxMSGHeader
     ULONG                CurrentThreadId;
     ULONG                Modifiable:1;
     ULONG                Modified:1;
-    ULONG                Reserved0:30;
+    ULONG                FirstEvent:1;
+    ULONG                NamedPipe:1;
+    ULONG                Reserved0:28;
     ULONG                Reserved1;
     ULONGLONG            Time;
 
@@ -456,7 +458,12 @@ struct cxUserSessionConfig
            ULONG        FilterFileCreateOnlyModifiable:1;
            ULONG        FilterFileCloseOnlyModified:1;
            ULONG        FilterRegOpenOnlyModifiable:1;
-           ULONG        FilterOther:27;
+           ULONG        FilterFileWriteOnlyFirstEvent:1;
+           ULONG        FilterFileReadOnlyFirstEvent:1;
+           ULONG        FilterFileWriteIgnoreNamedPipe:1;
+           ULONG        FilterFileReadIgnoreNamedPipe:1;
+           ULONG        FilterFileFindOnlyFirstEvent:1;
+           ULONG        FilterOther:22;
         };
 
         ULONG           Data[32];

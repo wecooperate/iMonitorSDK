@@ -32,8 +32,17 @@
 //******************************************************************************
 interface IMonitorMessageProcess
 {
+	enum emProcessType {
+		emProcessUnknown,
+		emProcessServices,
+		emProcessCsrss,
+		emProcessSvchost,
+		emProcessExplorer,
+	};
+
 	virtual ULONG			GetProcessId		(void) = 0;
 	virtual ULONG			GetParentProcessId	(void) = 0;
+	virtual	ULONG			GetCreatorProcessId	(void) = 0;
 	virtual LPCWSTR			GetProcessName		(void) = 0;
 	virtual LPCWSTR			GetProcessPath		(void) = 0;
 	virtual LPCWSTR			GetCommandline		(void) = 0;
@@ -46,6 +55,8 @@ interface IMonitorMessageProcess
 	virtual bool			IsCatalogSignerVerified(void) = 0;
 	virtual PUCHAR			GetMD5				(void) = 0;
 	virtual LPCWSTR			GetMD5String		(void) = 0;
+	virtual ULONGLONG		GetCreateTime		(void) = 0;
+	virtual emProcessType	GetProcessType		(void) = 0;
 };
 //******************************************************************************
 interface IMonitorMessage

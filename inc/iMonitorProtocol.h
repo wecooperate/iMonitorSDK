@@ -290,6 +290,7 @@ public:
 		emMSGFieldShareAccess,
 		emMSGFieldCreateDisposition,
 		emMSGFieldCreateOptions,
+		emMSGFieldExistsFileAttributes,
 	};
 
 public:
@@ -299,6 +300,7 @@ public:
 	auto ShareAccess() { return GetFileShareAccess(emMSGFieldShareAccess); }
 	auto CreateDisposition() { return GetFileDisposition(emMSGFieldCreateDisposition); }
 	auto CreateOptions() { return GetFileOptions(emMSGFieldCreateOptions); }
+	auto ExistsFileAttributes() { return GetFileAttributes(emMSGFieldExistsFileAttributes); }
 
 	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
 };
@@ -1733,6 +1735,162 @@ public:
 	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
 
 };
+class cxMSGWFPSend : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+		emMSGFieldDataLength,
+		emMSGFieldData,
+	};
+
+public:
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+	auto DataLength() { return GetULONG(emMSGFieldDataLength); }
+	auto Data() { return GetBinary(emMSGFieldData); }
+
+};
+class cxMSGWFPRecv : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+		emMSGFieldDataLength,
+		emMSGFieldData,
+	};
+
+public:
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+	auto DataLength() { return GetULONG(emMSGFieldDataLength); }
+	auto Data() { return GetBinary(emMSGFieldData); }
+
+};
+class cxMSGWFPSendTo : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+		emMSGFieldDataLength,
+		emMSGFieldData,
+	};
+
+public:
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+	auto DataLength() { return GetULONG(emMSGFieldDataLength); }
+	auto Data() { return GetBinary(emMSGFieldData); }
+
+};
+class cxMSGWFPRecvFrom : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+		emMSGFieldDataLength,
+		emMSGFieldData,
+	};
+
+public:
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+	auto DataLength() { return GetULONG(emMSGFieldDataLength); }
+	auto Data() { return GetBinary(emMSGFieldData); }
+
+};
+class cxMSGWFPICMPSendTo : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+		emMSGFieldDataLength,
+		emMSGFieldData,
+	};
+
+public:
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+	auto DataLength() { return GetULONG(emMSGFieldDataLength); }
+	auto Data() { return GetBinary(emMSGFieldData); }
+
+};
+class cxMSGWFPICMPRecvFrom : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+		emMSGFieldDataLength,
+		emMSGFieldData,
+	};
+
+public:
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+	auto DataLength() { return GetULONG(emMSGFieldDataLength); }
+	auto Data() { return GetBinary(emMSGFieldData); }
+
+};
 class cxMSGHTTPRequest : public MonitorMessage
 {
 public:
@@ -1777,6 +1935,74 @@ public:
 	bool IsMatchUrl(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldUrl, Pattern, IgnoreCase); }
 	bool IsMatchHeader(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldHeader, Pattern, IgnoreCase); }
 	bool IsMatchResponseHeader(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldResponseHeader, Pattern, IgnoreCase); }
+};
+class cxMSGExtensionDevicePassThroughDirect : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+	};
+
+public:
+	auto Path() { return GetString(emMSGFieldPath); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+};
+class cxMSGExtensionTaskScheduler : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldName,
+		emMSGFieldCommandline,
+		emMSGFieldUser,
+	};
+
+public:
+	auto Path() { return GetString(emMSGFieldPath); }
+	auto Name() { return GetString(emMSGFieldName); }
+	auto Commandline() { return GetString(emMSGFieldCommandline); }
+	auto User() { return GetString(emMSGFieldUser); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+	bool IsMatchName(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldName, Pattern, IgnoreCase); }
+	bool IsMatchCommandline(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldCommandline, Pattern, IgnoreCase); }
+	bool IsMatchUser(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldUser, Pattern, IgnoreCase); }
+};
+class cxMSGExtensionShellMonitor : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldReserved,
+		emMSGFieldWindowClassName,
+		emMSGFieldWindowName,
+		emMSGFieldEvent,
+	};
+
+public:
+	auto Reserved() { return GetString(emMSGFieldReserved); }
+	auto WindowClassName() { return GetString(emMSGFieldWindowClassName); }
+	auto WindowName() { return GetString(emMSGFieldWindowName); }
+	auto Event() { return GetULONG(emMSGFieldEvent); }
+
+	bool IsMatchReserved(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldReserved, Pattern, IgnoreCase); }
+	bool IsMatchWindowClassName(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldWindowClassName, Pattern, IgnoreCase); }
+	bool IsMatchWindowName(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldWindowName, Pattern, IgnoreCase); }
 };
 //******************************************************************************
 #endif

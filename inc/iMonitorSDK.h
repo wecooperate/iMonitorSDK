@@ -147,6 +147,19 @@ interface __declspec (uuid(IMONITOR_IID)) IMonitorManager : public IUnknown
 	virtual void			EnableDomainParser	(bool Enable) = 0;
 	virtual CString			GetDomainFromIP		(ULONG IP) = 0;
 	virtual CString			GetDomainFromIP		(const cxMSGDataIP& IP) = 0;
+
+	//
+	// 设置全局开关，需要在Start之前设置，修改设置需要卸载重新启动驱动
+	//		DisableXxxMonitor 表示是否关闭Xxx的监控，如果只需要部分能力，建议关闭其他不需要的监控。一般用于优化性能，解决冲突。
+	//
+	struct GlobalConfig {
+			bool			DisableFileMonitor	= false;
+			bool			DisableRegMonitor	= false;
+			bool			DisableSocketMonitor= false;
+			bool			DisableWFPMonitor	= false;
+			bool			DisableNPMSMonitor	= false;
+	};
+	virtual HRESULT			SetGlobalConfig		(const GlobalConfig& Config) = 0;
 };
 //******************************************************************************
 //
@@ -167,10 +180,10 @@ public:
 	{
 		Stop();
 
-		m_Monitor = NULL;
+		m_Monitor.Detach();
 	}
 
-	HRESULT Start(IMonitorCallback* Callback, LPCTSTR Path = MONITOR_MODULE_NAME)
+	HRESULT Start(IMonitorCallback* Callback, LPCTSTR Path = MONITOR_MODULE_NAME, IMonitorManager::GlobalConfig* Config = NULL)
 	{
 		HRESULT hr = LoadMonitor(Path);
 
@@ -179,11 +192,14 @@ public:
 
 		if (!m_Monitor)
 			return E_UNEXPECTED;
+
+		if (Config)
+			m_Monitor->SetGlobalConfig(*Config);
 
 		return m_Monitor->Start(Callback);
 	}
 
-	HRESULT InternalStart(IMonitorCallbackInternal* Callback, LPCTSTR Path = MONITOR_MODULE_NAME)
+	HRESULT InternalStart(IMonitorCallbackInternal* Callback, LPCTSTR Path = MONITOR_MODULE_NAME, IMonitorManager::GlobalConfig* Config = NULL)
 	{
 		HRESULT hr = LoadMonitor(Path);
 
@@ -192,6 +208,9 @@ public:
 
 		if (!m_Monitor)
 			return E_UNEXPECTED;
+
+		if (Config)
+			m_Monitor->SetGlobalConfig(*Config);
 
 		return m_Monitor->Start(Callback);
 	}

@@ -13,6 +13,7 @@
 #define MONITOR_VERSION                       2300
 #define MONITOR_LICENSE_VERSION               1
 #define MONITOR_MAX_BUFFER                    260
+#define MONITOR_MAX_QUICK_FILTER_COUNT        100
 //******************************************************************************
 #ifndef BIT
 #define BIT(n) (1 << n)
@@ -31,11 +32,13 @@ enum emMSGType
     emMSGSocket                               = 400,
     emMSGWFP                                  = 500,
     emMSGHTTP                                 = 600,
+    emMSGHook                                 = 700,
+    emMSGExtension                            = 800,
     emMSGMax                                  = 1000,
 };
 //******************************************************************************
 #define MSG_GET_GROUP(type) (type / 100)
-
+//******************************************************************************
 enum emMSGGroup {
 	emMSGGroupInternal                        = 0,
 	emMSGGroupProcess                         = 1,
@@ -44,6 +47,8 @@ enum emMSGGroup {
 	emMSGGroupSocket                          = 4,
 	emMSGGroupWFP                             = 5,
     emMSGGroupHTTP                            = 6,
+    emMSGGroupHook                            = 7,
+    emMSGGroupExtension                       = 8,
 	emMSGGroupMax,
 };
 //******************************************************************************
@@ -52,6 +57,11 @@ enum emMSGTypeInternal
     emMSGInternalEnumProcess = emMSGInternal + 1,
     emMSGInternalEnumProtectRule,
     emMSGInternalEnd,
+};
+//******************************************************************************
+enum emMSGGlobalFlagIndex {
+    emMSGGlobalFlagBegin = emMSGGroupMax,
+    emMSGGlobalFlagDisableNamedPipeAndMailsolt,
 };
 //******************************************************************************
 enum emMSGTypeProcess
@@ -149,12 +159,25 @@ enum emMSGTypeWFP
     emMSGWFPUdpAccept,
 	emMSGWFPICMPConnect,
     emMSGWFPICMPAccept,
+    emMSGWFPSend,
+    emMSGWFPRecv,
+    emMSGWFPSendTo,
+    emMSGWFPRecvFrom,
+    emMSGWFPICMPSendTo,
+    emMSGWFPICMPRecvFrom,
 };
 //******************************************************************************
 enum emMSGTypeHTTP
 {
     emMSGHTTPRequest = emMSGHTTP + 1,
     emMSGHTTPRequestEnd = emMSGHTTPRequest + 100,
+};
+//******************************************************************************
+enum emMSGTypeExtension
+{
+    emMSGExtensionDevicePassThroughDirect = emMSGExtension + 1,
+    emMSGExtensionTaskScheduler,
+    emMSGExtensionShellMonitor,
 };
 //******************************************************************************
 enum emMSGConfig
@@ -414,9 +437,13 @@ enum
     emUserRemoveProtectRule,
     emUserRemoveAllProtectRule,
     emUserEnumProtectRule,
+    emUserSetGlobalFilter,
+    emUserGetGlobalFilter,
 
     emAPIBegin = emMSGUserControl + 100,
     emAPIOpenProcess,
+    emAPIDeleteFile,
+    emAPITerminateProcess,
     emAPIEnd,
 };
 //******************************************************************************
@@ -426,7 +453,8 @@ struct cxUserGlobalConfig
         struct {
             ULONG        SwitchIncludeVS:1;
             ULONG        SwitchIncludeSelf:1;
-            ULONG        SwitchOther:30;
+            ULONG        SwitchQueryCreateFileAttributes:1;
+            ULONG        SwitchOther:29;
             ULONG        LogLevel;
             ULONG        MaxCallstack;
             ULONG        MaxBinaryData;
@@ -442,6 +470,8 @@ struct cxUserGlobalConfig
         MaxCallstack = 64;
         MaxBinaryData = 4096;
         SwitchIncludeVS = TRUE;
+        SwitchIncludeSelf = FALSE;
+        SwitchQueryCreateFileAttributes = FALSE;
     }
 };
 //******************************************************************************
@@ -508,6 +538,28 @@ struct cxUserProtectItem
     WCHAR        Path[MONITOR_MAX_BUFFER];
 };
 //******************************************************************************
+struct cxUserGlobalFilter
+{
+    struct PortFilter
+    {
+        ULONG   Count;
+        USHORT  Port[MONITOR_MAX_QUICK_FILTER_COUNT];
+    };
+
+    PortFilter  SendPorts;
+    PortFilter  RecvPorts;
+    PortFilter  SendToPorts;
+    PortFilter  RecvFromPorts;
+
+    cxUserGlobalFilter()
+    {
+        memset(&SendPorts, 0, sizeof(SendPorts));
+        memset(&RecvPorts, 0, sizeof(RecvPorts));
+        memset(&SendToPorts, 0, sizeof(SendToPorts));
+        memset(&RecvFromPorts, 0, sizeof(RecvFromPorts));
+    }
+};
+//******************************************************************************
 struct cxAPIOpenProcess
 {
     ULONG       ProcessId;
@@ -517,6 +569,17 @@ struct cxAPIOpenProcess
     {
         ULONG   ProcessHandle;
     };
+};
+//******************************************************************************
+struct cxAPITerminateProcess
+{
+    ULONG       ProcessId;
+};
+//******************************************************************************
+struct cxAPIDeleteFile
+{
+    WCHAR       Path[MONITOR_MAX_BUFFER];
+    ULONG       CloseAllHandles = TRUE;
 };
 //******************************************************************************
 typedef cxMSGUser<emUserSetGlobalConfig, cxUserGlobalConfig> cxMSGUserSetGlobalConfig;
@@ -531,7 +594,13 @@ typedef cxMSGUser<emUserAddProtectRule, cxUserProtectItem> cxMSGUserAddProtectRu
 typedef cxMSGUser<emUserRemoveProtectRule, cxUserProtectItem> cxMSGUserRemoveProtectRule;
 typedef cxMSGUser<emUserRemoveAllProtectRule> cxMSGUserRemoveAllProtectRule;
 typedef cxMSGUser<emUserEnumProtectRule> cxMSGUserEnumProtectRule;
+typedef cxMSGUser<emUserRemoveAllProtectRule> cxMSGUserRemoveAllProtectRule;
+typedef cxMSGUser<emUserEnumProtectRule> cxMSGUserEnumProtectRule;
+typedef cxMSGUser<emUserSetGlobalFilter, cxUserGlobalFilter> cxMSGUserSetGlobalFilter;
+typedef cxMSGUser<emUserGetGlobalFilter, cxUserGlobalFilter> cxMSGUserGetGlobalFilter;
 //******************************************************************************
 typedef cxMSGUser<emAPIOpenProcess, cxAPIOpenProcess> cxMSGAPIOpenProcess;
+typedef cxMSGUser<emAPITerminateProcess, cxAPITerminateProcess> cxMSGAPITerminateProcess;
+typedef cxMSGUser<emAPIDeleteFile, cxAPIDeleteFile> cxMSGAPIDeleteFile;
 //******************************************************************************
 #endif

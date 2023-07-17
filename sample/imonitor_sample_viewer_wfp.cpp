@@ -43,7 +43,7 @@ int main()
 
 	cxMSGUserSetMSGConfig config;
 	for (int i = emMSGWFP; i < emMSGWFP + 100; i++) {
-		config.Config[i] = emMSGConfigPost;
+		config.Config[i] = emMSGConfigPost | emMSGConfigIncludeKernelEvent;
 	}
 	manager.InControl(config);
 

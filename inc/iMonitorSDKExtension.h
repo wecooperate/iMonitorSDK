@@ -22,20 +22,8 @@ interface IMonitorRule
 	virtual const char*		GetActionParam		(void) = 0;
 	virtual	ULONG			GetMessageTypeCount	(void) = 0;
 	virtual ULONG			GetMessageType		(ULONG Index) = 0;
-};
-//******************************************************************************
-interface IMonitorMessageField
-{
-	using RuleString = CStringW;
-	using RuleNumber = ULONGLONG;
-
-	virtual	bool			GetString			(IMonitorMessage* Object, RuleString& Value) = 0;
-	virtual bool			GetNumber			(IMonitorMessage* Object, RuleNumber& Value) = 0;
-};
-//******************************************************************************
-interface IMonitorRuleContext
-{
-	virtual IMonitorMessageField* GetCustomField(const char* Field) = 0;
+	virtual ULONG			GetCustomNumber		(const char* Name) = 0;
+	virtual const char*		GetCustomString		(const char* Name) = 0;
 };
 //******************************************************************************
 interface IMonitorMatchCallback

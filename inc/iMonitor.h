@@ -178,6 +178,7 @@ enum emMSGTypeExtension
     emMSGExtensionDevicePassThroughDirect = emMSGExtension + 1,
     emMSGExtensionTaskScheduler,
     emMSGExtensionShellMonitor,
+    emMSGExtensionHarddiskDeviceControl,
 };
 //******************************************************************************
 enum emMSGConfig

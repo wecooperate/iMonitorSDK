@@ -2004,6 +2004,25 @@ public:
 	bool IsMatchWindowClassName(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldWindowClassName, Pattern, IgnoreCase); }
 	bool IsMatchWindowName(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldWindowName, Pattern, IgnoreCase); }
 };
+class cxMSGExtensionHarddiskDeviceControl : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldControlCode,
+	};
+
+public:
+	auto Path() { return GetString(emMSGFieldPath); }
+	auto ControlCode() { return GetULONG(emMSGFieldControlCode); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+};
 //******************************************************************************
 #endif
 

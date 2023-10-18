@@ -62,6 +62,8 @@ interface IMonitorMessageProcess
 	virtual emProcessType	GetProcessType		(void) = 0;
 	virtual bool			GetMD5				(UCHAR Hash[16]) = 0;
 	virtual LPCWSTR			GetMD5String		(void) = 0;
+	virtual bool			Is64Bit				(void) = 0;
+	virtual bool			IsWOW64Process		(void) = 0;
 };
 //******************************************************************************
 interface IMonitorMessage
@@ -117,7 +119,7 @@ interface IMonitorMessage
 	virtual bool			SetIPRedirect		(ULONG IP, USHORT Port, ULONG ProcessId = ::GetCurrentProcessId()) = 0;
 	virtual bool			SetTerminateProcess	(void) = 0;
 	virtual bool			SetTerminateThread	(void) = 0;
-	virtual bool			SetInjectDll		(LPCWSTR Path) = 0;
+	virtual bool			SetInjectDll		(LPCWSTR Path, bool AlertThread, bool NewThread = false) = 0;
 	virtual bool			SetFileRedirect		(LPCWSTR Path) = 0;
 
 	//
@@ -133,6 +135,8 @@ interface IMonitorMessage
 
 	virtual void			SetCustomContext	(PVOID Context) = 0;
 	virtual PVOID			GetCustomContext	(void) = 0;
+
+	virtual bool			IsUserMonitor		(void) = 0;
 };
 //******************************************************************************
 struct MonitorExtensionField
@@ -164,7 +168,7 @@ interface IMonitorCallback
 			bool			DisableSocketMonitor= false;
 			bool			DisableWFPMonitor	= false;
 			bool			DisableNPMSMonitor	= false;
-
+			bool			DisableUserMonitor	= true;
 			bool			InternalCallback	= false;
 
 			MonitorExtensionFieldTable ExtensionFieldTable;

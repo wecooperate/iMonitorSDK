@@ -20,7 +20,7 @@ public:
 			return;
 
 		if (msg->IsMatchPath(L"*\\kernel32.dll")) {
-			msg->SetInjectDll(L"D:\\test.dll");
+			msg->SetInjectDll(L"D:\\test.dll", true);
 		}
 	}
 };

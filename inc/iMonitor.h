@@ -62,6 +62,7 @@ enum emMSGTypeInternal
 enum emMSGGlobalFlagIndex {
     emMSGGlobalFlagBegin = emMSGGroupMax,
     emMSGGlobalFlagDisableNamedPipeAndMailsolt,
+    emMSGGlobalFlagDisableRedirector,
 };
 //******************************************************************************
 enum emMSGTypeProcess
@@ -201,6 +202,9 @@ enum emMSGAction
     emMSGActionTerminateProcess                = BIT(3),
     emMSGActionTerminateThread                 = BIT(4),
     emMSGActionLoadLibrary                     = BIT(5),
+    emMSGActionLoadLibraryNoAlert              = BIT(6),
+    emMSGActionLoadLibraryByCreateThread       = BIT(7),
+    emMSGActionExecuteShellCode                = BIT(8),
     emMSGActionRecord                          = BIT(20),
 };
 //******************************************************************************
@@ -441,6 +445,9 @@ enum
     emUserSetGlobalFilter,
     emUserGetGlobalFilter,
 
+    emUserSetRedirectorRules,
+    emUserRemoveRedirectorRules,
+
     emAPIBegin = emMSGUserControl + 100,
     emAPIOpenProcess,
     emAPIDeleteFile,
@@ -561,6 +568,11 @@ struct cxUserGlobalFilter
     }
 };
 //******************************************************************************
+struct cxUserStringData
+{
+    CHAR        Data[1];
+};
+//******************************************************************************
 struct cxAPIOpenProcess
 {
     ULONG       ProcessId;
@@ -599,6 +611,8 @@ typedef cxMSGUser<emUserRemoveAllProtectRule> cxMSGUserRemoveAllProtectRule;
 typedef cxMSGUser<emUserEnumProtectRule> cxMSGUserEnumProtectRule;
 typedef cxMSGUser<emUserSetGlobalFilter, cxUserGlobalFilter> cxMSGUserSetGlobalFilter;
 typedef cxMSGUser<emUserGetGlobalFilter, cxUserGlobalFilter> cxMSGUserGetGlobalFilter;
+typedef cxMSGUser<emUserSetRedirectorRules, cxUserStringData> cxMSGUserSetRedirectorRules;
+typedef cxMSGUser<emUserRemoveRedirectorRules> cxMSGUserRemoveRedirectorRules;
 //******************************************************************************
 typedef cxMSGUser<emAPIOpenProcess, cxAPIOpenProcess> cxMSGAPIOpenProcess;
 typedef cxMSGUser<emAPITerminateProcess, cxAPITerminateProcess> cxMSGAPITerminateProcess;

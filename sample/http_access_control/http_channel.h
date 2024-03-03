@@ -8,6 +8,7 @@
 #ifndef __HttpChannel_h_8986995e_95dc_420a_a755_c54d0821c3ab__
 #define __HttpChannel_h_8986995e_95dc_420a_a755_c54d0821c3ab__
 //******************************************************************************
+#include <string>
 #include "imonitor_sample.h"
 #include "http_parser/http_parser_wrapper.h"
 //******************************************************************************

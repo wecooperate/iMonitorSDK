@@ -40,8 +40,6 @@ int main()
 		return 0;
 	}
 
-	manager.InControl(cxMSGUserSetGlobalConfig());
-
 	cxMSGUserSetMSGConfig config;
 	config.Config[emMSGProcessOpen] = emMSGConfigSend;
 	manager.InControl(config);

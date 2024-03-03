@@ -54,8 +54,8 @@ interface IMonitorMessageProcess
 	virtual LPCWSTR			GetCompanyName		(void) = 0;
 	virtual LPCWSTR			GetProductName		(void) = 0;
 	virtual LPCWSTR			GetFileDescription	(void) = 0;
-	virtual LPCWSTR			GetSigner			(void) = 0;
-	virtual bool			IsSignerVerified	(void) = 0;
+	virtual LPCWSTR			GetEmbeddedSigner	(void) = 0;
+	virtual bool			IsEmbeddedSignerVerified(void) = 0;
 	virtual LPCWSTR			GetCatalogSigner	(void) = 0;
 	virtual bool			IsCatalogSignerVerified(void) = 0;
 	virtual ULONGLONG		GetCreateTime		(void) = 0;
@@ -84,6 +84,7 @@ interface IMonitorMessage
 	inline ULONG			GetCurrentThreadId	(void) { return GetHeader()->CurrentThreadId; }
 
 	virtual IMonitorMessageProcess* GetProcess	(void) = 0;
+	virtual IMonitorMessageProcess* GetRpcCallerProcess(void) = 0; // 如果存在Rpc远程调用则返回调用者进程，否则返回GetProcess
 
 	virtual LPCWSTR			GetTypeName			(void) = 0;
 	virtual ULONG			GetFieldCount		(void) = 0;
@@ -121,6 +122,7 @@ interface IMonitorMessage
 	virtual bool			SetTerminateThread	(void) = 0;
 	virtual bool			SetInjectDll		(LPCWSTR Path, bool AlertThread, bool NewThread = false) = 0;
 	virtual bool			SetFileRedirect		(LPCWSTR Path) = 0;
+	virtual bool			InjectPacket		(PCHAR Data, ULONG Length, bool Inbound) = 0;
 
 	//
 	//	异步处理：
@@ -197,6 +199,18 @@ interface IMonitorExtension
 	virtual void			EnableDomainParser	(bool Enable) = 0;
 	virtual cxMSGDataString	GetDomainFromIP		(ULONG IP) = 0;
 	virtual cxMSGDataString	GetDomainFromIP		(const cxMSGDataIP& IP) = 0;
+
+	//
+	// 查询文件信息
+	//
+	struct SignerInfo
+	{
+		cxMSGDataString Signer;
+		cxMSGDataString SignerThumbprint;
+		bool IsVerified;
+	};
+
+	virtual SignerInfo		GetPESigner			(LPCWSTR Path, bool IncludeCatalog = true) = 0;
 };
 //******************************************************************************
 interface __declspec (uuid(IMONITOR_IID)) IMonitorManager : public IUnknown, public IMonitorExtension
@@ -206,6 +220,7 @@ interface __declspec (uuid(IMONITOR_IID)) IMonitorManager : public IUnknown, pub
 	virtual HRESULT			Stop				(void) = 0;
 	virtual HRESULT			UnloadDriver		(void) = 0;
 	virtual HRESULT			SendCustomEvent		(ULONG Type, PVOID Context) = 0;
+	virtual HRESULT			RebuildVolumeCache	(void) = 0;
 };
 //******************************************************************************
 //
@@ -271,6 +286,14 @@ public:
 		return m_Monitor->SendCustomEvent(Type, Context);
 	}
 
+	HRESULT RebuildVolumeCache(void)
+	{
+		if (!m_Monitor)
+			return E_UNEXPECTED;
+
+		return m_Monitor->RebuildVolumeCache();
+	}
+
 	HRESULT FindProcess(ULONG ProcessId, IMonitorProcess** Process)
 	{
 		if (!m_Monitor)
@@ -293,6 +316,35 @@ public:
 			return CString();
 
 		return m_Monitor->GetDomainFromIP(IP);
+	}
+
+	IMonitorManager::SignerInfo GetPESigner(LPCWSTR Path)
+	{
+		if (!m_Monitor)
+			return IMonitorManager::SignerInfo();
+
+		return m_Monitor->GetPESigner(Path);
+	}
+
+	HRESULT SetRules(ULONG Type, const char* Rules)
+	{
+		size_t length = strlen(Rules);
+		size_t total_length = length + sizeof(cxMSGUserHeader);
+		cxMSGUserHeader* header = (cxMSGUserHeader*)new char[total_length];
+
+		if (!header)
+			return E_UNEXPECTED;
+
+		memset(header, 0, total_length);
+		new (header) cxMSGUserHeader;
+		header->Type = Type;
+		strncpy((char*)(header + 1), Rules, length);
+
+		HRESULT hr = Control(header, (ULONG)total_length);
+
+		delete header;
+
+		return hr;
 	}
 
 public:

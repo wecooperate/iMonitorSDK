@@ -1,7 +1,8 @@
 //******************************************************************************
 /*++
 	Description:
-		自保护规则设置
+
+	自保护使用示例
 
 --*/
 //******************************************************************************
@@ -72,15 +73,17 @@ int main()
 		// 添加信任进程：可以操作被保护的进程、文件、注册表，但是进程本身不受保护
 		//
 		cxMSGUserAddProtectRule rule;
-		rule.ProtectType = emProtectTypeTrustProcess;
+		rule.ProtectType = emProtectTypeTrustedProcess;
 		wcsncpy(rule.Path, L"*taskkill*", MONITOR_MAX_BUFFER);
 		manager.InControl(rule);
 	}
 
-	WaitForExit("自保护开启中：带taskkill的进程为白名单\r\n"
-				"\t保护notepad.exe进程不被结束（不包括界面上的关闭，比如任务管理器的结束任务)\r\n"
-				"\t保护protect的目录下面文件不被修改\r\n"
-				"\t保护iMonitor的注册表键下的内容不被修改");
+	WaitForExit("自保护开启中：带taskkill的进程为白名单\n"
+				"\t保护notepad.exe进程不被结束（不包括界面上的关闭，比如任务管理器的结束任务)\n"
+				"\t保护protect的目录下面文件不被修改\n"
+				"\t保护iMonitor的注册表键下的内容不被修改\n"
+				"\t注意：此功能是设置，设置完成要恢复需要移除规则！\n"
+				"\t按任意键移除规则并退出。");
 
 	manager.InControl(cxMSGUserRemoveAllProtectRule());
 	manager.InControl(cxMSGUserDisableProtect());

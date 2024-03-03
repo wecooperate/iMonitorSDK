@@ -10,7 +10,7 @@
 //******************************************************************************
 // clang-format off
 //******************************************************************************
-#define MONITOR_VERSION                       2300
+#define MONITOR_VERSION                       4000
 #define MONITOR_LICENSE_VERSION               1
 #define MONITOR_MAX_BUFFER                    260
 #define MONITOR_MAX_QUICK_FILTER_COUNT        100
@@ -34,6 +34,7 @@ enum emMSGType
     emMSGHTTP                                 = 600,
     emMSGHook                                 = 700,
     emMSGExtension                            = 800,
+    emMSGETW                                  = 900,
     emMSGMax                                  = 1000,
 };
 //******************************************************************************
@@ -63,6 +64,7 @@ enum emMSGGlobalFlagIndex {
     emMSGGlobalFlagBegin = emMSGGroupMax,
     emMSGGlobalFlagDisableNamedPipeAndMailsolt,
     emMSGGlobalFlagDisableRedirector,
+    emMSGGlobalFlagEnableSelfProtect,
 };
 //******************************************************************************
 enum emMSGTypeProcess
@@ -74,6 +76,7 @@ enum emMSGTypeProcess
     emMSGThreadExit,
     emMSGThreadOpen,
     emMSGImageLoad,
+    emMSGDriverLoad,
     emMSGProcessStart,
     emMSGThreadStart,
 };
@@ -166,6 +169,8 @@ enum emMSGTypeWFP
     emMSGWFPRecvFrom,
     emMSGWFPICMPSendTo,
     emMSGWFPICMPRecvFrom,
+    emMSGWFPTcpBind,
+    emMSGWFPUdpBind,
 };
 //******************************************************************************
 enum emMSGTypeHTTP
@@ -174,12 +179,35 @@ enum emMSGTypeHTTP
     emMSGHTTPRequestEnd = emMSGHTTPRequest + 100,
 };
 //******************************************************************************
+enum emMSGTypeHook
+{
+    emMSGHookWriteProcessMemory = emMSGHook + 1,
+    emMSGHookRpcCreateProcess,
+    emMSGHookSetWindowsHookEx,
+    emMSGHookCreateService,
+    emMSGHookStartService,
+    emMSGHookChangeServiceConfig,
+    emMSGHookCoCreateInstance,
+    emMSGHookSetContextThread,
+    emMSGHookQueueApcThread,
+    emMSGHookMapViewOfSection,
+    emMSGHookReadProcessMemory,
+    emMSGHookDuplicateHandle,
+    emMSGHookSendInput,
+    emMSGHookShutdownSystem,
+    emMSGHookSetSystemTime,
+    emMSGHookGetClipboardData,
+    emMSGHookSetDeskWallpaper,
+    emMSGHookUseCamera,
+};
+//******************************************************************************
 enum emMSGTypeExtension
 {
     emMSGExtensionDevicePassThroughDirect = emMSGExtension + 1,
     emMSGExtensionTaskScheduler,
     emMSGExtensionShellMonitor,
     emMSGExtensionHarddiskDeviceControl,
+    emMSGExtensionDnsQuery,
 };
 //******************************************************************************
 enum emMSGConfig
@@ -190,6 +218,8 @@ enum emMSGConfig
     emMSGConfigRule                            = BIT(2),
     emMSGConfigEnable                          = emMSGConfigPost | emMSGConfigSend | emMSGConfigRule,
     emMSGConfigIncludeKernelEvent              = BIT(10),
+    emMSGConfigFetchRpcCaller                  = BIT(11),
+    emMSGConfigFetchSystemRpcCaller            = BIT(12),
 };
 //******************************************************************************
 enum emMSGAction
@@ -205,6 +235,9 @@ enum emMSGAction
     emMSGActionLoadLibraryNoAlert              = BIT(6),
     emMSGActionLoadLibraryByCreateThread       = BIT(7),
     emMSGActionExecuteShellCode                = BIT(8),
+    emMSGActionInjectInboundPacket             = BIT(9),
+    emMSGActionInjectOutboundPacket            = BIT(10),
+    emMSGActionIgnore                          = BIT(19),
     emMSGActionRecord                          = BIT(20),
 };
 //******************************************************************************
@@ -291,6 +324,8 @@ enum emMSGStatus
     emMSGStatusEnumEnd,
 };
 //******************************************************************************
+#pragma pack(push, 1)
+//******************************************************************************
 //
 //    【驱动 --> 应用层】
 //
@@ -309,8 +344,10 @@ struct cxMSGHeader
     ULONG                Modified:1;
     ULONG                FirstEvent:1;
     ULONG                NamedPipe:1;
-    ULONG                Reserved0:28;
-    ULONG                Reserved1;
+    ULONG                Suspicious:1;
+    ULONG                Reserved0:27;
+    ULONG                RpcCallerProcessId;
+    ULONGLONG            RuleId;
     ULONGLONG            Time;
 
     //
@@ -444,9 +481,14 @@ enum
     emUserEnumProtectRule,
     emUserSetGlobalFilter,
     emUserGetGlobalFilter,
-
     emUserSetRedirectorRules,
     emUserRemoveRedirectorRules,
+    emUserSetHiddenRules,
+    emUserRemoveHiddenRules,
+    emUserSetMSGRules,
+    emUserRemoveMSGRules,
+    emUserSetSandboxRules,
+    emUserRemoveSandboxRules,
 
     emAPIBegin = emMSGUserControl + 100,
     emAPIOpenProcess,
@@ -533,11 +575,12 @@ struct cxUserMSGConfig
 //******************************************************************************
 enum emUserProtectType
 {
-    emProtectTypeTrustProcess = BIT(0),
+    emProtectTypeTrustedProcess = BIT(0),
     emProtectTypeProcessPath = BIT(1),
     emProtectTypeFilePath = BIT(2),
     emProtectTypeRegPath = BIT(3),
-    emProtectTypeConnectedOnly = BIT(12),
+    emProtectTypeIgnoredProcess = BIT(11),
+    emProtectTypeValidWhenSessionConnected = BIT(12),
 };
 //******************************************************************************
 struct cxUserProtectItem
@@ -573,6 +616,73 @@ struct cxUserStringData
     CHAR        Data[1];
 };
 //******************************************************************************
+struct cxUserStringRedirectorRules : public cxUserStringData
+{
+    // 
+    // processes空表示所有进程， files不能为空
+    //
+	// 	[
+	// 		{
+	// 			"processes": [],
+	// 			"files": [
+	// 				{ "source": "", "target": "" }
+	// 			],
+	// 		}
+	// 	]
+};
+//******************************************************************************
+struct cxUserStringHiddenRules : public cxUserStringData
+{
+    //
+    // processes空表示所有进程， files不能为空
+    //
+	// 	[
+	// 		{
+	// 			"processes": [ ],
+	// 			"files": [ ],
+    //          "ignore_files": []
+	// 		}
+	// 	]
+};
+//******************************************************************************
+struct cxUserStringMSGRules : public cxUserStringData
+{
+	// 	{
+    //      "rules": [
+    //      {
+    //         "action": 1,
+    //         "event": "ProcessCreate",
+    //         "matcher": {
+    //             "and": [
+    //                 { "match": [ "CurrentProcessPath", "*\\cmd.exe" ] },
+    //                 { "match": [ "Path", "*\\notepad.exe" ] },
+    //                 { "end": 0 }
+    //             ]
+    //         }
+    //     }
+    //     ]
+	// 	}
+};
+//******************************************************************************
+struct cxUserStringSandboxRules : public cxUserStringData
+{
+    //
+    // processes不能为空， files空表示所有的文件
+    //
+    // [
+    //     {
+    //         "processes": [],
+    //         "files": [],
+    //         "ignore_files": [],
+    //         "forbid_files": [],
+    //         "sandbox_name": "test",
+    //         "sandbox_root": "C:\\sandbox",
+    //         "include_child_processes": true,
+    //         "include_exist_processes": false
+    //     }
+    // ]
+};
+//******************************************************************************
 struct cxAPIOpenProcess
 {
     ULONG       ProcessId;
@@ -595,6 +705,8 @@ struct cxAPIDeleteFile
     ULONG       CloseAllHandles = TRUE;
 };
 //******************************************************************************
+#pragma pack(pop)
+//******************************************************************************
 typedef cxMSGUser<emUserSetGlobalConfig, cxUserGlobalConfig> cxMSGUserSetGlobalConfig;
 typedef cxMSGUser<emUserGetGlobalConfig, cxUserGlobalConfig> cxMSGUserGetGlobalConfig;
 typedef cxMSGUser<emUserSetSessionConfig, cxUserSessionConfig> cxMSGUserSetSessionConfig;
@@ -611,8 +723,14 @@ typedef cxMSGUser<emUserRemoveAllProtectRule> cxMSGUserRemoveAllProtectRule;
 typedef cxMSGUser<emUserEnumProtectRule> cxMSGUserEnumProtectRule;
 typedef cxMSGUser<emUserSetGlobalFilter, cxUserGlobalFilter> cxMSGUserSetGlobalFilter;
 typedef cxMSGUser<emUserGetGlobalFilter, cxUserGlobalFilter> cxMSGUserGetGlobalFilter;
-typedef cxMSGUser<emUserSetRedirectorRules, cxUserStringData> cxMSGUserSetRedirectorRules;
+typedef cxMSGUser<emUserSetRedirectorRules, cxUserStringRedirectorRules> cxMSGUserSetRedirectorRules;
 typedef cxMSGUser<emUserRemoveRedirectorRules> cxMSGUserRemoveRedirectorRules;
+typedef cxMSGUser<emUserSetHiddenRules, cxUserStringHiddenRules> cxMSGUserSetHiddenRules;
+typedef cxMSGUser<emUserRemoveHiddenRules> cxMSGUserRemoveHiddenRules;
+typedef cxMSGUser<emUserSetMSGRules, cxUserStringMSGRules> cxMSGUserSetMSGRules;
+typedef cxMSGUser<emUserRemoveMSGRules> cxMSGUserRemoveMSGRules;
+typedef cxMSGUser<emUserSetSandboxRules, cxUserStringSandboxRules> cxMSGUserSetSandboxRules;
+typedef cxMSGUser<emUserRemoveSandboxRules> cxMSGUserRemoveSandboxRules;
 //******************************************************************************
 typedef cxMSGUser<emAPIOpenProcess, cxAPIOpenProcess> cxMSGAPIOpenProcess;
 typedef cxMSGUser<emAPITerminateProcess, cxAPITerminateProcess> cxMSGAPITerminateProcess;

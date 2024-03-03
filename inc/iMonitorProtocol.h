@@ -216,6 +216,29 @@ public:
 
 	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
 };
+class cxMSGDriverLoad : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldProcessId,
+		emMSGFieldImageBase,
+		emMSGFieldImageSize,
+	};
+
+public:
+	auto Path() { return GetPath(emMSGFieldPath); }
+	auto ProcessId() { return GetULONG(emMSGFieldProcessId); }
+	auto ImageBase() { return GetULONGLONG(emMSGFieldImageBase); }
+	auto ImageSize() { return GetULONGLONG(emMSGFieldImageSize); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+};
 class cxMSGProcessStart : public MonitorMessage
 {
 public:
@@ -1891,6 +1914,42 @@ public:
 	auto Data() { return GetBinary(emMSGFieldData); }
 
 };
+class cxMSGWFPTcpBind : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+	};
+
+public:
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+
+};
+class cxMSGWFPUdpBind : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+	};
+
+public:
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+
+};
 class cxMSGHTTPRequest : public MonitorMessage
 {
 public:
@@ -2022,6 +2081,404 @@ public:
 	auto ControlCode() { return GetULONG(emMSGFieldControlCode); }
 
 	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+};
+class cxMSGExtensionDnsQuery : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldIP,
+		emMSGFieldPort,
+		emMSGFieldLocalIP,
+		emMSGFieldLocalPort,
+		emMSGFieldDataLength,
+		emMSGFieldData,
+		emMSGFieldDomain,
+	};
+
+public:
+	auto IP() { return GetSocketIP(emMSGFieldIP); }
+	auto Port() { return GetSocketPort(emMSGFieldPort); }
+	auto LocalIP() { return GetSocketIP(emMSGFieldLocalIP); }
+	auto LocalPort() { return GetSocketPort(emMSGFieldLocalPort); }
+	auto DataLength() { return GetULONG(emMSGFieldDataLength); }
+	auto Data() { return GetBinary(emMSGFieldData); }
+	auto Domain() { return GetString(emMSGFieldDomain); }
+
+	bool IsMatchDomain(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldDomain, Pattern, IgnoreCase); }
+};
+class cxMSGHookWriteProcessMemory : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldProcessId,
+		emMSGFieldBaseAddress,
+		emMSGFieldSize,
+		emMSGFieldBuffer,
+	};
+
+public:
+	auto Path() { return GetString(emMSGFieldPath); }
+	auto ProcessId() { return GetULONG(emMSGFieldProcessId); }
+	auto BaseAddress() { return GetULONGLONG(emMSGFieldBaseAddress); }
+	auto Size() { return GetULONG(emMSGFieldSize); }
+	auto Buffer() { return GetBinary(emMSGFieldBuffer); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+};
+class cxMSGHookRpcCreateProcess : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldCommandline,
+		emMSGFieldParentProcessId,
+		emMSGFieldParentPath,
+		emMSGFieldParentCommandline,
+	};
+
+public:
+	auto Path() { return GetPath(emMSGFieldPath); }
+	auto Commandline() { return GetString(emMSGFieldCommandline); }
+	auto ParentProcessId() { return GetULONG(emMSGFieldParentProcessId); }
+	auto ParentPath() { return GetPath(emMSGFieldParentPath); }
+	auto ParentCommandline() { return GetString(emMSGFieldParentCommandline); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+	bool IsMatchCommandline(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldCommandline, Pattern, IgnoreCase); }
+	bool IsMatchParentPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldParentPath, Pattern, IgnoreCase); }
+	bool IsMatchParentCommandline(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldParentCommandline, Pattern, IgnoreCase); }
+};
+class cxMSGHookSetWindowsHookEx : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldType,
+		emMSGFieldThreadId,
+		emMSGFieldHookProc,
+		emMSGFieldInstance,
+		emMSGFieldInstancePath,
+	};
+
+public:
+	auto Type() { return GetULONG(emMSGFieldType); }
+	auto ThreadId() { return GetULONG(emMSGFieldThreadId); }
+	auto HookProc() { return GetULONGLONG(emMSGFieldHookProc); }
+	auto Instance() { return GetULONGLONG(emMSGFieldInstance); }
+	auto InstancePath() { return GetString(emMSGFieldInstancePath); }
+
+	bool IsMatchInstancePath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldInstancePath, Pattern, IgnoreCase); }
+};
+class cxMSGHookCreateService : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldServiceName,
+		emMSGFieldDisplayName,
+		emMSGFieldBinPath,
+		emMSGFieldServiceType,
+		emMSGFieldStartType,
+	};
+
+public:
+	auto ServiceName() { return GetString(emMSGFieldServiceName); }
+	auto DisplayName() { return GetString(emMSGFieldDisplayName); }
+	auto BinPath() { return GetString(emMSGFieldBinPath); }
+	auto ServiceType() { return GetULONG(emMSGFieldServiceType); }
+	auto StartType() { return GetULONG(emMSGFieldStartType); }
+
+	bool IsMatchServiceName(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldServiceName, Pattern, IgnoreCase); }
+	bool IsMatchDisplayName(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldDisplayName, Pattern, IgnoreCase); }
+	bool IsMatchBinPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldBinPath, Pattern, IgnoreCase); }
+};
+class cxMSGHookStartService : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldServiceName,
+	};
+
+public:
+	auto ServiceName() { return GetString(emMSGFieldServiceName); }
+
+	bool IsMatchServiceName(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldServiceName, Pattern, IgnoreCase); }
+};
+class cxMSGHookChangeServiceConfig : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldServiceName,
+		emMSGFieldServiceType,
+		emMSGFieldStartType,
+	};
+
+public:
+	auto ServiceName() { return GetString(emMSGFieldServiceName); }
+	auto ServiceType() { return GetULONG(emMSGFieldServiceType); }
+	auto StartType() { return GetULONG(emMSGFieldStartType); }
+
+	bool IsMatchServiceName(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldServiceName, Pattern, IgnoreCase); }
+};
+class cxMSGHookCoCreateInstance : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldContext,
+		emMSGFieldClassId,
+		emMSGFieldInterfaceId,
+	};
+
+public:
+	auto Context() { return GetULONG(emMSGFieldContext); }
+	auto ClassId() { return GetString(emMSGFieldClassId); }
+	auto InterfaceId() { return GetString(emMSGFieldInterfaceId); }
+
+	bool IsMatchClassId(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldClassId, Pattern, IgnoreCase); }
+	bool IsMatchInterfaceId(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldInterfaceId, Pattern, IgnoreCase); }
+};
+class cxMSGHookSetContextThread : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldProcessId,
+		emMSGFieldThreadId,
+	};
+
+public:
+	auto Path() { return GetString(emMSGFieldPath); }
+	auto ProcessId() { return GetULONG(emMSGFieldProcessId); }
+	auto ThreadId() { return GetULONG(emMSGFieldThreadId); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+};
+class cxMSGHookQueueApcThread : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldProcessId,
+		emMSGFieldThreadId,
+		emMSGFieldApcRoutine,
+	};
+
+public:
+	auto Path() { return GetString(emMSGFieldPath); }
+	auto ProcessId() { return GetULONG(emMSGFieldProcessId); }
+	auto ThreadId() { return GetULONG(emMSGFieldThreadId); }
+	auto ApcRoutine() { return GetULONGLONG(emMSGFieldApcRoutine); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+};
+class cxMSGHookMapViewOfSection : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldProcessId,
+	};
+
+public:
+	auto Path() { return GetString(emMSGFieldPath); }
+	auto ProcessId() { return GetULONG(emMSGFieldProcessId); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+};
+class cxMSGHookReadProcessMemory : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldProcessId,
+		emMSGFieldBaseAddress,
+		emMSGFieldSize,
+	};
+
+public:
+	auto Path() { return GetString(emMSGFieldPath); }
+	auto ProcessId() { return GetULONG(emMSGFieldProcessId); }
+	auto BaseAddress() { return GetULONGLONG(emMSGFieldBaseAddress); }
+	auto Size() { return GetULONG(emMSGFieldSize); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+};
+class cxMSGHookDuplicateHandle : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+		emMSGFieldProcessId,
+		emMSGFieldHandle,
+	};
+
+public:
+	auto Path() { return GetString(emMSGFieldPath); }
+	auto ProcessId() { return GetULONG(emMSGFieldProcessId); }
+	auto Handle() { return GetULONG(emMSGFieldHandle); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+};
+class cxMSGHookSendInput : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldType,
+	};
+
+public:
+	auto Type() { return GetULONG(emMSGFieldType); }
+
+};
+class cxMSGHookShutdownSystem : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldRestart,
+	};
+
+public:
+	auto Restart() { return GetBool(emMSGFieldRestart); }
+
+};
+class cxMSGHookSetSystemTime : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldTime,
+	};
+
+public:
+	auto Time() { return GetULONGLONG(emMSGFieldTime); }
+
+};
+class cxMSGHookGetClipboardData : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldFormat,
+	};
+
+public:
+	auto Format() { return GetULONG(emMSGFieldFormat); }
+
+};
+class cxMSGHookSetDeskWallpaper : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldPath,
+	};
+
+public:
+	auto Path() { return GetString(emMSGFieldPath); }
+
+	bool IsMatchPath(LPCWSTR Pattern, bool IgnoreCase = true) { return IsMatch(emMSGFieldPath, Pattern, IgnoreCase); }
+};
+class cxMSGHookUseCamera : public MonitorMessage
+{
+public:
+	enum {
+		emMSGFieldCallstack,
+		emMSGFieldCurrentProcessCreateTime,
+		emMSGFieldCurrentProcessName,
+		emMSGFieldCurrentProcessPath,
+		emMSGFieldCurrentProcessCommandline,
+		emMSGFieldAction,
+	};
+
+public:
+	auto Action() { return GetULONG(emMSGFieldAction); }
+
 };
 //******************************************************************************
 #endif

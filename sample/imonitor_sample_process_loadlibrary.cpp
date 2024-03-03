@@ -2,6 +2,9 @@
 /*++
 	Description:
 
+	动态库加载拦截示例：
+		禁止 dbgmsgcfg.dll 的模块被加载
+
 --*/
 //******************************************************************************
 #include "imonitor_sample.h"
@@ -38,8 +41,6 @@ int main()
 		printf("start failed = %08X\n", hr);
 		return 0;
 	}
-
-	manager.InControl(cxMSGUserSetGlobalConfig());
 
 	cxMSGUserSetMSGConfig config;
 	config.Config[emMSGImageLoad] = emMSGConfigSend;

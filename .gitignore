@@ -1,0 +1,10 @@
+.vs
+tmp
+Debug
+Release
+bin
+bin64
+lib
+lib64
+build
+build64

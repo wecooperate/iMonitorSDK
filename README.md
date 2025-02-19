@@ -10,8 +10,6 @@ iMonitorSDK uses a communication framework based on message protocol to make dri
 
 Using iMonitorSDK, you can realize self-protection, process interception, ransomware defense, active defense, Internet behavior management and other endpoint security functions at a very low cost.
 
-**To prevent the SDK from being used illegally, apply to support@trustsing.com for a test SDK using your enterprise email address. The remarks describe the company information and usage scenarios.**
-
 ### [Documents](https://imonitorsdk.com/)
 
 ### ✨ Core Functions
